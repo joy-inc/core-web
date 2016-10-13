@@ -1,5 +1,6 @@
 package com.joy.webview.module;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 
 import com.joy.inject.ActivityScope;
@@ -22,19 +23,18 @@ public class BaseWebX5Module {
     private final BaseViewWebX5 mBaseViewWebX5;
 
     public BaseWebX5Module(BaseViewWebX5 baseViewWebX5) {
-
         mBaseViewWebX5 = baseViewWebX5;
     }
 
     @Provides
     @ActivityScope
     BaseViewWebX5 provideBaseViewWebX5() {
-
         return mBaseViewWebX5;
     }
 
     @Provides
     @ActivityScope
+    @SuppressLint("SetJavaScriptEnabled")
     WebView provideWebView(Activity activity) {
 
         QbSdk.allowThirdPartyAppDownload(true);

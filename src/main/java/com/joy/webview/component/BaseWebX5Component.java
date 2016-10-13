@@ -18,5 +18,6 @@ import dagger.Component;
 public interface BaseWebX5Component {
 
     void inject(BaseWebX5Activity activity);
+
     void inject(BaseWebX5ActivityNoTitle activity);
 }

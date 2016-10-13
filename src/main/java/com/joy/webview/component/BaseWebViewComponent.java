@@ -18,5 +18,6 @@ import dagger.Component;
 public interface BaseWebViewComponent {
 
     void inject(BaseWebViewActivity activity);
+
     void inject(BaseWebViewActivityNoTitle activity);
 }

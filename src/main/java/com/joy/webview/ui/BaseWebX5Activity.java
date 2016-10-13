@@ -2,11 +2,14 @@ package com.joy.webview.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.widget.TextView;
 
 import com.joy.inject.module.ActivityModule;
-import com.joy.share.ShareUtil;
+import com.joy.share.JoyShare;
 import com.joy.ui.activity.BaseHttpUiActivity;
 import com.joy.utils.TextUtil;
 import com.joy.webview.R;
@@ -14,7 +17,9 @@ import com.joy.webview.component.BaseWebX5Component;
 import com.joy.webview.component.DaggerBaseWebX5Component;
 import com.joy.webview.module.BaseWebX5Module;
 import com.joy.webview.presenter.BaseWebX5Presenter;
+import com.joy.webview.presenter.IPresenter;
 import com.joy.webview.ui.interfaces.BaseViewWebX5;
+import com.joy.webview.ui.interfaces.KConstant;
 import com.tencent.smtt.sdk.WebView;
 
 import javax.inject.Inject;
@@ -23,10 +28,8 @@ import javax.inject.Inject;
  * Created by Daisw on 16/8/14.
  */
 
-public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWebX5 {
+public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWebX5, KConstant {
 
-    private static final String KEY_URL = "KEY_URL";
-    private static final String KEY_TITLE = "KEY_TITLE";
     private String mUrl;
     private String mTitle;
     private TextView mTvTitle;
@@ -36,68 +39,86 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+
         component().inject(this);
         setContentView(mPresenter.getWebView());
         mPresenter.load(mUrl);
     }
 
     private BaseWebX5Component component() {
-
         return DaggerBaseWebX5Component.builder()
                 .activityModule(new ActivityModule(this))
                 .baseWebX5Module(new BaseWebX5Module(this))
                 .build();
     }
 
+    protected IPresenter getPresenter() {
+        return mPresenter;
+    }
+
     @Override
     protected void initData() {
-
         mUrl = getIntent().getStringExtra(KEY_URL);
         mTitle = getIntent().getStringExtra(KEY_TITLE);
+        mPresenter.setUserAgent(getIntent().getStringExtra(KEY_USER_AGENT));
     }
 
     @Override
     protected void initTitleView() {
-
-        ShareUtil shareUtil = new ShareUtil(this);
+        JoyShare joyShare = new JoyShare(this);
+        joyShare.setData(joyShare.getDefaultItems());
 
         addTitleLeftBackView(R.drawable.ic_arrow_back_white_24dp);
-        addTitleRightView(R.drawable.ic_more_vert_white_24dp, (v) -> shareUtil.show());
-//        if (TextUtil.isNotEmpty(mTitle))
+        addTitleRightView(R.drawable.ic_more_vert_white_24dp, (v) -> joyShare.show());
         mTvTitle = addTitleMiddleView(mTitle);
     }
 
     @Override
     protected void doOnRetry() {
-
         mPresenter.reload();
     }
 
     @Override
-    public void onReceivedTitle(WebView view, String title) {
+    public void onPageStarted(WebView view, String url, Bitmap favicon) {
+    }
 
+    @Override
+    public void onPageFinished(WebView view, String url) {
+    }
+
+    @Override
+    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+    }
+
+    @Override
+    public void onReceivedTitle(WebView view, String title) {
         if (TextUtil.isEmpty(mTitle))
             mTvTitle.setText(title);
     }
 
     @Override
-    public boolean overrideUrl(WebView view, String url) {
+    public void onProgress(WebView view, int progress) {
+    }
 
+    @Override
+    public boolean onOverrideUrl(WebView view, String url) {
         return false;
     }
 
-    public static void startActivity(Context context, String url) {
-
+    public static void startActivity(@NonNull Context context, @NonNull String url) {
         startActivity(context, url, null);
     }
 
-    public static void startActivity(Context context, String url, String title) {
+    public static void startActivity(@NonNull Context context, @NonNull String url, @Nullable String title) {
+        startActivity(context, url, title, null);
+    }
 
+    public static void startActivity(@NonNull Context context, @NonNull String url, @Nullable String title, @Nullable String userAgent) {
         Intent intent = new Intent(context, BaseWebX5Activity.class);
         intent.putExtra(KEY_URL, url);
         intent.putExtra(KEY_TITLE, title);
+        intent.putExtra(KEY_USER_AGENT, userAgent);
         context.startActivity(intent);
     }
 }
