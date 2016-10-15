@@ -1,11 +1,17 @@
 package com.joy.webview.ui;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.View;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient.CustomViewCallback;
+import android.webkit.WebChromeClient.FileChooserParams;
 import android.webkit.WebView;
 import android.widget.TextView;
 
@@ -23,6 +29,9 @@ import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.joy.webview.ui.interfaces.KConstant;
 
 import javax.inject.Inject;
+
+import static android.os.Build.VERSION_CODES.HONEYCOMB;
+import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
 /**
  * Created by Daisw on 16/8/14.
@@ -103,6 +112,27 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
 
     @Override
     public boolean onOverrideUrl(WebView view, String url) {
+        return false;
+    }
+
+    @Override
+    public void onShowCustomView(View view, CustomViewCallback callback) {
+    }
+
+    @Override
+    public void onHideCustomView() {
+    }
+
+    // file upload callback for 3.0 ~ 5.0
+    @Override
+    @TargetApi(HONEYCOMB)
+    public void onShowFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, @Nullable String capture) {
+    }
+
+    // file upload callback for >= 5.0
+    @Override
+    @TargetApi(LOLLIPOP)
+    public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
         return false;
     }
 

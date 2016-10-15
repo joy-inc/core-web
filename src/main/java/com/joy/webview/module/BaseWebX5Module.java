@@ -5,6 +5,8 @@ import android.app.Activity;
 
 import com.joy.inject.ActivityScope;
 import com.joy.inject.module.ActivityModule;
+import com.joy.utils.TextUtil;
+import com.joy.webview.JoyWeb;
 import com.joy.webview.ui.interfaces.BaseViewWebX5;
 import com.tencent.smtt.sdk.QbSdk;
 import com.tencent.smtt.sdk.WebSettings;
@@ -42,10 +44,16 @@ public class BaseWebX5Module {
         WebView webView = new WebView(activity);
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
+        settings.setAllowFileAccess(true);
 
         settings.setSupportZoom(false);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
+
+        String userAgent = JoyWeb.getUserAgent();
+        if (TextUtil.isNotEmpty(userAgent)) {
+            settings.setUserAgentString(settings.getUserAgentString() + " " + userAgent);
+        }
 
         return webView;
     }

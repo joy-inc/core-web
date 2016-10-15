@@ -41,14 +41,16 @@ public class BaseWebViewModule {
         WebView webView = new WebView(activity);
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
+        settings.setAllowFileAccess(true);
 
         settings.setSupportZoom(false);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
 
         String userAgent = JoyWeb.getUserAgent();
-        if (TextUtil.isNotEmpty(userAgent))
+        if (TextUtil.isNotEmpty(userAgent)) {
             settings.setUserAgentString(settings.getUserAgentString() + " " + userAgent);
+        }
 
         return webView;
     }

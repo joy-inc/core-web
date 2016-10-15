@@ -1,8 +1,10 @@
 package com.joy.webview.ui;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,10 +23,16 @@ import com.joy.webview.presenter.BaseWebX5Presenter;
 import com.joy.webview.presenter.IPresenter;
 import com.joy.webview.ui.interfaces.BaseViewWebX5;
 import com.joy.webview.ui.interfaces.KConstant;
+import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient.CustomViewCallback;
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
+import com.tencent.smtt.sdk.ValueCallback;
+import com.tencent.smtt.sdk.WebChromeClient.FileChooserParams;
 import com.tencent.smtt.sdk.WebView;
 
 import javax.inject.Inject;
 
+import static android.os.Build.VERSION_CODES.HONEYCOMB;
+import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 /**
@@ -85,7 +93,7 @@ public class BaseWebX5ActivityNoTitle extends BaseHttpUiActivity implements Base
     }
 
     @Override
-    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+    public void onReceivedError(WebView view, WebResourceRequest resourceRequest) {
     }
 
     @Override
@@ -98,6 +106,27 @@ public class BaseWebX5ActivityNoTitle extends BaseHttpUiActivity implements Base
 
     @Override
     public boolean onOverrideUrl(WebView view, String url) {
+        return false;
+    }
+
+    @Override
+    public void onShowCustomView(View view, CustomViewCallback callback) {
+    }
+
+    @Override
+    public void onHideCustomView() {
+    }
+
+    // file upload callback for 3.0 ~ 5.0
+    @Override
+    @TargetApi(HONEYCOMB)
+    public void onShowFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, @Nullable String capture) {
+    }
+
+    // file upload callback for >= 5.0
+    @Override
+    @TargetApi(LOLLIPOP)
+    public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
         return false;
     }
 
