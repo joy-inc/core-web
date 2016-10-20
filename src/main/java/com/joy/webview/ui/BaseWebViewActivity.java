@@ -19,7 +19,6 @@ import com.joy.inject.module.ActivityModule;
 import com.joy.share.JoyShare;
 import com.joy.share.ShareItem;
 import com.joy.ui.activity.BaseHttpUiActivity;
-import com.joy.ui.adapter.OnItemClickListener;
 import com.joy.utils.TextUtil;
 import com.joy.webview.R;
 import com.joy.webview.component.BaseWebViewComponent;
@@ -46,10 +45,10 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     @Inject
     BaseWebViewPresenter mPresenter;
 
-    private String mUrl;
-    private String mTitle;
-    private TextView mTvTitle;
-    private JoyShare mJoyShare;
+    protected String mUrl;
+    protected String mTitle;
+    protected TextView mTvTitle;
+    protected JoyShare mJoyShare;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +73,8 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
         mPresenter.setUserAgent(getIntent().getStringExtra(KEY_USER_AGENT));
 
         mJoyShare = new JoyShare(this);
-        mJoyShare.setData(mJoyShare.getDefaultItems());
+        mJoyShare.setData(getShareItems());
+        mJoyShare.setOnItemClickListener(this::onShareItemClick);
     }
 
     @Override
@@ -84,20 +84,16 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
         mTvTitle = addTitleMiddleView(mTitle);
     }
 
-    protected IPresenter getPresenter() {
+    protected final IPresenter getPresenter() {
         return mPresenter;
     }
 
-    protected JoyShare getJoyShare() {
-        return mJoyShare;
+    protected List<ShareItem> getShareItems() {
+        return mJoyShare.getDefaultItems();
     }
 
-    protected void setShareData(List<ShareItem> shareItems) {
-        mJoyShare.setData(shareItems);
-    }
-
-    protected void setShareOnItemClickListener(OnItemClickListener<ShareItem> l) {
-        mJoyShare.setOnItemClickListener(l);
+    protected void onShareItemClick(int position, View v, ShareItem item) {
+        mJoyShare.dismiss();
     }
 
     @Override

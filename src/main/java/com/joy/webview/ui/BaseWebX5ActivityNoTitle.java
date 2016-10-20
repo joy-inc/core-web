@@ -17,7 +17,6 @@ import com.joy.inject.module.ActivityModule;
 import com.joy.share.JoyShare;
 import com.joy.share.ShareItem;
 import com.joy.ui.activity.BaseHttpUiActivity;
-import com.joy.ui.adapter.OnItemClickListener;
 import com.joy.webview.R;
 import com.joy.webview.component.BaseWebX5Component;
 import com.joy.webview.component.DaggerBaseWebX5Component;
@@ -50,9 +49,9 @@ public class BaseWebX5ActivityNoTitle extends BaseHttpUiActivity implements Base
     @Inject
     BaseWebX5Presenter mPresenter;
 
-    private String mUrl;
-    private JoyShare mJoyShare;
-    private NavigationBar mNavBar;
+    protected String mUrl;
+    protected JoyShare mJoyShare;
+    protected NavigationBar mNavBar;
     private boolean mNavDisplay = true;
     private boolean mNavAnimate = true;
 
@@ -110,23 +109,20 @@ public class BaseWebX5ActivityNoTitle extends BaseHttpUiActivity implements Base
         mPresenter.setUserAgent(getIntent().getStringExtra(KEY_USER_AGENT));
 
         mJoyShare = new JoyShare(this);
-        mJoyShare.setData(mJoyShare.getDefaultItems());
+        mJoyShare.setData(getShareItems());
+        mJoyShare.setOnItemClickListener(this::onShareItemClick);
     }
 
-    protected IPresenter getPresenter() {
+    protected final IPresenter getPresenter() {
         return mPresenter;
     }
 
-    protected JoyShare getJoyShare() {
-        return mJoyShare;
+    protected List<ShareItem> getShareItems() {
+        return mJoyShare.getDefaultItems();
     }
 
-    protected void setShareData(List<ShareItem> shareItems) {
-        mJoyShare.setData(shareItems);
-    }
-
-    protected void setShareOnItemClickListener(OnItemClickListener<ShareItem> l) {
-        mJoyShare.setOnItemClickListener(l);
+    protected void onShareItemClick(int position, View v, ShareItem item) {
+        mJoyShare.dismiss();
     }
 
     @Override
@@ -150,7 +146,7 @@ public class BaseWebX5ActivityNoTitle extends BaseHttpUiActivity implements Base
     }
 
     @Override
-    public final void onReceivedTitle(WebView view, String title) {
+    public void onReceivedTitle(WebView view, String title) {
     }
 
     @Override
