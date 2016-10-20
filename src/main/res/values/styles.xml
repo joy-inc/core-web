@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="NavigationBar">
+        <attr name="navDisplay" format="boolean" />
+        <attr name="navAnimate" format="boolean" />
+        <attr name="navHeight" format="dimension" />
+        <attr name="navElevation" format="dimension" />
+        <attr name="navBackgroundColor" format="color" />
+        <attr name="navIconFirst" format="reference" />
+        <attr name="navIconSecond" format="reference" />
+        <attr name="navIconThird" format="reference" />
+        <attr name="navIconFourth" format="reference" />
+        <attr name="navIconBackground" format="reference" />
+    </declare-styleable>
+
+    <style name="theme_web" parent="base_theme" />
+
+    <style name="theme_web.navigation">
+        <item name="noTitle">true</item>
+        <item name="navDisplay">true</item>
+        <item name="navAnimate">true</item>
+        <item name="navHeight">@dimen/def_toolbar_height</item>
+        <item name="navElevation">4dp</item>
+        <item name="navBackgroundColor">?colorPrimary</item>
+        <item name="navIconFirst">@drawable/ic_chevron_left_white_24dp</item>
+        <item name="navIconSecond">@drawable/ic_close_white_24dp</item>
+        <item name="navIconThird">@drawable/ic_chevron_right_white_24dp</item>
+        <item name="navIconFourth">@drawable/ic_more_horiz_white_24dp</item>
+        <item name="navIconBackground">@drawable/control_background_52dp_material</item>
+    </style>
+
+</resources>

@@ -17,7 +17,9 @@ import android.widget.TextView;
 
 import com.joy.inject.module.ActivityModule;
 import com.joy.share.JoyShare;
+import com.joy.share.ShareItem;
 import com.joy.ui.activity.BaseHttpUiActivity;
+import com.joy.ui.adapter.OnItemClickListener;
 import com.joy.utils.TextUtil;
 import com.joy.webview.R;
 import com.joy.webview.component.BaseWebViewComponent;
@@ -27,6 +29,8 @@ import com.joy.webview.presenter.BaseWebViewPresenter;
 import com.joy.webview.presenter.IPresenter;
 import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.joy.webview.ui.interfaces.KConstant;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -39,12 +43,13 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
 public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewWeb, KConstant {
 
+    @Inject
+    BaseWebViewPresenter mPresenter;
+
     private String mUrl;
     private String mTitle;
     private TextView mTvTitle;
-
-    @Inject
-    BaseWebViewPresenter mPresenter;
+    private JoyShare mJoyShare;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,25 +67,37 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
                 .build();
     }
 
-    protected IPresenter getPresenter() {
-        return mPresenter;
-    }
-
     @Override
     protected void initData() {
         mUrl = getIntent().getStringExtra(KEY_URL);
         mTitle = getIntent().getStringExtra(KEY_TITLE);
         mPresenter.setUserAgent(getIntent().getStringExtra(KEY_USER_AGENT));
+
+        mJoyShare = new JoyShare(this);
+        mJoyShare.setData(mJoyShare.getDefaultItems());
     }
 
     @Override
     protected void initTitleView() {
-        JoyShare joyShare = new JoyShare(this);
-        joyShare.setData(joyShare.getDefaultItems());
-
         addTitleLeftBackView(R.drawable.ic_arrow_back_white_24dp);
-        addTitleRightView(R.drawable.ic_more_vert_white_24dp, (v) -> joyShare.show());
+        addTitleRightView(R.drawable.ic_more_vert_white_24dp, (v) -> mJoyShare.show());
         mTvTitle = addTitleMiddleView(mTitle);
+    }
+
+    protected IPresenter getPresenter() {
+        return mPresenter;
+    }
+
+    protected JoyShare getJoyShare() {
+        return mJoyShare;
+    }
+
+    protected void setShareData(List<ShareItem> shareItems) {
+        mJoyShare.setData(shareItems);
+    }
+
+    protected void setShareOnItemClickListener(OnItemClickListener<ShareItem> l) {
+        mJoyShare.setOnItemClickListener(l);
     }
 
     @Override
@@ -134,6 +151,10 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     @TargetApi(LOLLIPOP)
     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
         return false;
+    }
+
+    @Override
+    public void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
     }
 
     public static void startActivity(@NonNull Context context, @NonNull String url) {

@@ -2,6 +2,7 @@ package com.joy.webview.module;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.view.MotionEvent;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
@@ -38,7 +39,24 @@ public class BaseWebViewModule {
     @SuppressLint("SetJavaScriptEnabled")
     WebView provideWebView(Activity activity) {
 
-        WebView webView = new WebView(activity);
+        WebView webView = new WebView(activity) {
+            boolean isTouchTriggered = false;
+
+            @Override
+            protected void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if (isTouchTriggered) {
+                    mBaseViewWeb.onScrollChanged(scrollX, scrollY, oldScrollX, oldScrollY);
+                }
+            }
+
+            @Override
+            public boolean onInterceptTouchEvent(MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    isTouchTriggered = true;
+                }
+                return super.onInterceptTouchEvent(event);
+            }
+        };
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setAllowFileAccess(true);

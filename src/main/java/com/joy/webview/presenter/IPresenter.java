@@ -17,6 +17,10 @@ public interface IPresenter {
 
     void reload();
 
+    boolean canGoBack();
+
+    boolean canGoForward();
+
     void goBack();
 
     void goForward();

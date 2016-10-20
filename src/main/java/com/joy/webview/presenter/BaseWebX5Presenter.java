@@ -214,12 +214,28 @@ public class BaseWebX5Presenter implements IPresenter {
     }
 
     @Override
+    public boolean canGoBack() {
+        return mWebView.canGoBack();
+    }
+
+    @Override
+    public boolean canGoForward() {
+        return mWebView.canGoForward();
+    }
+
+    @Override
     public void goBack() {
-        mWebView.goBack();
+        if (canGoBack()) {
+            mWebView.goBack();
+        } else {
+            mBaseView.finish();
+        }
     }
 
     @Override
     public void goForward() {
-        mWebView.goForward();
+        if (canGoForward()) {
+            mWebView.goForward();
+        }
     }
 }

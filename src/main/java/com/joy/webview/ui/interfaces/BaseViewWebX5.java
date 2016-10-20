@@ -43,4 +43,6 @@ public interface BaseViewWebX5 extends BaseViewNet {
 
     @TargetApi(LOLLIPOP)
     boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams);
+
+    void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY);
 }
