@@ -3,6 +3,8 @@ package com.joy.webview.presenter;
 import android.support.annotation.WorkerThread;
 import android.webkit.JavascriptInterface;
 
+import org.jsoup.nodes.Document;
+
 /**
  * Created by Daisw on 2016/10/13.
  */
@@ -25,7 +27,11 @@ public interface IPresenter {
 
     void goForward();
 
+    Document getDocument();
+
     String getTag(String tagName);
+
+    String getAttribute(String attrName, String attrValue, String attributeKey);
 
     abstract class JSHtmlSource {
         @JavascriptInterface

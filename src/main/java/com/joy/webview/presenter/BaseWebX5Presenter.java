@@ -8,10 +8,10 @@ import android.support.annotation.WorkerThread;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 
-import com.joy.utils.CollectionUtil;
 import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
 import com.joy.webview.ui.interfaces.BaseViewWebX5;
+import com.joy.webview.utils.DocumentParser;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient.CustomViewCallback;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.ValueCallback;
@@ -22,8 +22,6 @@ import com.tencent.smtt.sdk.WebViewClient;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import javax.inject.Inject;
 
@@ -176,15 +174,18 @@ public class BaseWebX5Presenter implements IPresenter {
     }
 
     @Override
+    public Document getDocument() {
+        return mDocument;
+    }
+
+    @Override
     public String getTag(String tagName) {
-        if (mDocument != null) {
-            Elements elements = mDocument.getElementsByTag(tagName);
-            if (CollectionUtil.isNotEmpty(elements)) {
-                Element element = elements.get(0);
-                return element.text();
-            }
-        }
-        return null;
+        return DocumentParser.getTag(mDocument, tagName);
+    }
+
+    @Override
+    public String getAttribute(String attrName, String attrValue, String attributeKey) {
+        return DocumentParser.getAttribute(mDocument, attrName, attrValue, attributeKey);
     }
 
     public WebView getWebView() {

@@ -26,7 +26,6 @@ import com.joy.webview.component.BaseWebViewComponent;
 import com.joy.webview.component.DaggerBaseWebViewComponent;
 import com.joy.webview.module.BaseWebViewModule;
 import com.joy.webview.presenter.BaseWebViewPresenter;
-import com.joy.webview.presenter.IPresenter;
 import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.joy.webview.ui.interfaces.KConstant;
 import com.joy.webview.view.NavigationBar;
@@ -112,7 +111,7 @@ public class BaseWebViewActivityNoTitle extends BaseHttpUiActivity implements Ba
         mJoyShare.setOnItemClickListener(this::onShareItemClick);
     }
 
-    protected final IPresenter getPresenter() {
+    protected final BaseWebViewPresenter getPresenter() {
         return mPresenter;
     }
 

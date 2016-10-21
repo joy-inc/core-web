@@ -25,7 +25,6 @@ import com.joy.webview.component.BaseWebViewComponent;
 import com.joy.webview.component.DaggerBaseWebViewComponent;
 import com.joy.webview.module.BaseWebViewModule;
 import com.joy.webview.presenter.BaseWebViewPresenter;
-import com.joy.webview.presenter.IPresenter;
 import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.joy.webview.ui.interfaces.KConstant;
 
@@ -84,7 +83,7 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
         mTvTitle = addTitleMiddleView(mTitle);
     }
 
-    protected final IPresenter getPresenter() {
+    protected final BaseWebViewPresenter getPresenter() {
         return mPresenter;
     }
 

@@ -13,15 +13,13 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.joy.utils.CollectionUtil;
 import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
 import com.joy.webview.ui.interfaces.BaseViewWeb;
+import com.joy.webview.utils.DocumentParser;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import javax.inject.Inject;
 
@@ -173,15 +171,18 @@ public class BaseWebViewPresenter implements IPresenter {
     }
 
     @Override
+    public Document getDocument() {
+        return mDocument;
+    }
+
+    @Override
     public String getTag(String tagName) {
-        if (mDocument != null) {
-            Elements elements = mDocument.getElementsByTag(tagName);
-            if (CollectionUtil.isNotEmpty(elements)) {
-                Element element = elements.get(0);
-                return element.text();
-            }
-        }
-        return null;
+        return DocumentParser.getTag(mDocument, tagName);
+    }
+
+    @Override
+    public String getAttribute(String attrName, String attrValue, String attributeKey) {
+        return DocumentParser.getAttribute(mDocument, attrName, attrValue, attributeKey);
     }
 
     public WebView getWebView() {

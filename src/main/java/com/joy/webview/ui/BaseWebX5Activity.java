@@ -21,7 +21,6 @@ import com.joy.webview.component.BaseWebX5Component;
 import com.joy.webview.component.DaggerBaseWebX5Component;
 import com.joy.webview.module.BaseWebX5Module;
 import com.joy.webview.presenter.BaseWebX5Presenter;
-import com.joy.webview.presenter.IPresenter;
 import com.joy.webview.ui.interfaces.BaseViewWebX5;
 import com.joy.webview.ui.interfaces.KConstant;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient.CustomViewCallback;
@@ -85,7 +84,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         mTvTitle = addTitleMiddleView(mTitle);
     }
 
-    protected final IPresenter getPresenter() {
+    protected final BaseWebX5Presenter getPresenter() {
         return mPresenter;
     }
 
