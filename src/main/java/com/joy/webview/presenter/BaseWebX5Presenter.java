@@ -22,6 +22,8 @@ import com.tencent.smtt.sdk.WebViewClient;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import javax.inject.Inject;
 
@@ -176,6 +178,21 @@ public class BaseWebX5Presenter implements IPresenter {
     @Override
     public Document getDocument() {
         return mDocument;
+    }
+
+    @Override
+    public Elements getElementsByTag(String tagName) {
+        return DocumentParser.getElementsByTag(mDocument, tagName);
+    }
+
+    @Override
+    public Element getElementByTag(String tagName, int index) {
+        return DocumentParser.getElementByTag(mDocument, tagName, index);
+    }
+
+    @Override
+    public Element getFirstElementByTag(String tagName) {
+        return DocumentParser.getFirstElementByTag(mDocument, tagName);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.joy.webview.utils;
 
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import static com.joy.utils.TextUtil.TEXT_EMPTY;
@@ -11,6 +12,21 @@ import static com.joy.utils.TextUtil.TEXT_EMPTY;
 
 public class DocumentParser {
 
+    public static Elements getElementsByTag(Document document, String tagName) {
+        if (document != null) {
+            return document.getElementsByTag(tagName);
+        }
+        return null;
+    }
+
+    public static Element getElementByTag(Document document, String tagName, int index) {
+        return getElementsByTag(document, tagName).get(index);
+    }
+
+    public static Element getFirstElementByTag(Document document, String tagName) {
+        return getElementByTag(document, tagName, 0);
+    }
+
     /**
      * eg: <description>希望每一刻大家都有幸运女神的庇护，但是如果你是那不幸的几分之几，也希望多些勇气理性面对困境。</description>
      * String desc = getTag("description");// 希望每一刻大家都有幸运女神的庇护，但是如果你是那不幸的几分之几，也希望多些勇气理性面对困境。
@@ -20,9 +36,9 @@ public class DocumentParser {
      * @return
      */
     public static String getTag(Document document, String tagName) {
-        if (document != null) {
-            Elements elements = document.getElementsByTag(tagName);
-            return elements.get(0).text();
+        Element element = getFirstElementByTag(document, tagName);
+        if (element != null) {
+            return element.text();
         }
         return TEXT_EMPTY;
     }

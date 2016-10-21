@@ -4,6 +4,8 @@ import android.support.annotation.WorkerThread;
 import android.webkit.JavascriptInterface;
 
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  * Created by Daisw on 2016/10/13.
@@ -28,6 +30,12 @@ public interface IPresenter {
     void goForward();
 
     Document getDocument();
+
+    Elements getElementsByTag(String tagName);
+
+    Element getElementByTag(String tagName, int index);
+
+    Element getFirstElementByTag(String tagName);
 
     String getTag(String tagName);
 
