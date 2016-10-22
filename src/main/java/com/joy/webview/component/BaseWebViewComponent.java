@@ -3,7 +3,6 @@ package com.joy.webview.component;
 import com.joy.inject.ActivityScope;
 import com.joy.webview.module.BaseWebViewModule;
 import com.joy.webview.ui.BaseWebViewActivity;
-import com.joy.webview.ui.BaseWebViewActivityNoTitle;
 
 import dagger.Component;
 
@@ -18,6 +17,4 @@ import dagger.Component;
 public interface BaseWebViewComponent {
 
     void inject(BaseWebViewActivity activity);
-
-    void inject(BaseWebViewActivityNoTitle activity);
 }

@@ -216,13 +216,15 @@ public class BaseWebX5Presenter implements IPresenter {
 
     @Override
     public void load(String url) {
-        String cookie = JoyWeb.getCookie();
-        mNeedSeedCookie = TextUtil.isNotEmpty(cookie) && !JoyWeb.mIsCookieSeeded;
-        if (mNeedSeedCookie) {
-            mInitialUrl = url;
-            mWebView.loadUrl(cookie);
-        } else {
-            mWebView.loadUrl(url);
+        if (TextUtil.isNotEmpty(url)) {
+            String cookie = JoyWeb.getCookie();
+            mNeedSeedCookie = TextUtil.isNotEmpty(cookie) && !JoyWeb.mIsCookieSeeded;
+            if (mNeedSeedCookie) {
+                mInitialUrl = url;
+                mWebView.loadUrl(cookie);
+            } else {
+                mWebView.loadUrl(url);
+            }
         }
     }
 

@@ -16,19 +16,11 @@
         <activity
             android:name=".ui.BaseWebViewActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/theme_web" />
-        <activity
-            android:name=".ui.BaseWebViewActivityNoTitle"
-            android:screenOrientation="portrait"
-            android:theme="@style/theme_web.navigation" />
+            android:theme="@style/base_theme.web" />
         <activity
             android:name=".ui.BaseWebX5Activity"
             android:screenOrientation="portrait"
-            android:theme="@style/theme_web" />
-        <activity
-            android:name=".ui.BaseWebX5ActivityNoTitle"
-            android:screenOrientation="portrait"
-            android:theme="@style/theme_web.navigation" />
+            android:theme="@style/base_theme.web" />
     </application>
 
 </manifest>

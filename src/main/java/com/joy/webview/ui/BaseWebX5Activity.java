@@ -3,12 +3,15 @@ package com.joy.webview.ui;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.FrameLayout.LayoutParams;
 import android.widget.TextView;
 
 import com.joy.inject.module.ActivityModule;
@@ -23,6 +26,7 @@ import com.joy.webview.module.BaseWebX5Module;
 import com.joy.webview.presenter.BaseWebX5Presenter;
 import com.joy.webview.ui.interfaces.BaseViewWebX5;
 import com.joy.webview.ui.interfaces.KConstant;
+import com.joy.webview.view.NavigationBar;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient.CustomViewCallback;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.ValueCallback;
@@ -35,9 +39,10 @@ import javax.inject.Inject;
 
 import static android.os.Build.VERSION_CODES.HONEYCOMB;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 /**
- * Created by Daisw on 16/8/14.
+ * Created by Daisw on 16/9/7.
  */
 
 public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWebX5, KConstant {
@@ -49,6 +54,11 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     protected String mTitle;
     protected TextView mTvTitle;
     protected JoyShare mJoyShare;
+    protected NavigationBar mNavBar;
+    protected boolean mNavDisplay = true;
+    protected boolean mNavAnimate = true;
+    protected int mNavHeight;
+    protected int mNavElevation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +66,8 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
         component().inject(this);
         setContentView(mPresenter.getWebView());
+        resolveThemeAttribute();// remove
+        addNavBarIfNecessary();
         mPresenter.load(mUrl);
     }
 
@@ -64,6 +76,40 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
                 .activityModule(new ActivityModule(this))
                 .baseWebX5Module(new BaseWebX5Module(this))
                 .build();
+    }
+
+    //    @Override
+    protected void resolveThemeAttribute() {
+        TypedArray a = obtainStyledAttributes(R.styleable.NavigationBar);
+        mNavDisplay = a.getBoolean(R.styleable.NavigationBar_navDisplay, true);
+        mNavAnimate = a.getBoolean(R.styleable.NavigationBar_navAnimate, true);
+        mNavHeight = a.getDimensionPixelSize(R.styleable.NavigationBar_navHeight, 0);
+        mNavElevation = a.getDimensionPixelSize(R.styleable.NavigationBar_navElevation, 0);
+        a.recycle();
+    }
+
+    private void addNavBarIfNecessary() {
+        if (mNavDisplay) {
+            mNavBar = initNavigationBar();
+            if (mNavAnimate) {
+                mNavBar.setAlpha(0.f);
+                mNavBar.setTranslationY(mNavHeight);
+            } else {
+                getContentViewLp().bottomMargin = mNavHeight - mNavElevation;
+            }
+            LayoutParams navBarLp = new LayoutParams(MATCH_PARENT, mNavHeight);
+            navBarLp.gravity = Gravity.BOTTOM;
+            addContentView(mNavBar, navBarLp);
+        }
+    }
+
+    protected NavigationBar initNavigationBar() {
+        NavigationBar navBar = inflateLayout(R.layout.lib_view_web_navigation_bar);
+        navBar.findViewById(R.id.ivNav1).setOnClickListener((v1) -> mPresenter.goBack());
+        navBar.findViewById(R.id.ivNav2).setOnClickListener((v1) -> finish());
+        navBar.findViewById(R.id.ivNav3).setOnClickListener((v1) -> mPresenter.goForward());
+        navBar.findViewById(R.id.ivNav4).setOnClickListener((v1) -> mJoyShare.show());
+        return navBar;
     }
 
     @Override
@@ -79,9 +125,11 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     protected void initTitleView() {
-        addTitleLeftBackView(R.drawable.ic_arrow_back_white_24dp);
-        addTitleRightView(R.drawable.ic_more_vert_white_24dp, (v) -> mJoyShare.show());
-        mTvTitle = addTitleMiddleView(mTitle);
+        if (!isNoTitle()) {
+            addTitleLeftBackView();
+            addTitleRightMoreView((v) -> mJoyShare.show());
+            mTvTitle = addTitleMiddleView(mTitle);
+        }
     }
 
     protected final BaseWebX5Presenter getPresenter() {
@@ -107,6 +155,9 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     public void onPageFinished(WebView view, String url) {
+        if (mNavDisplay && mNavAnimate) {
+            mNavBar.runEnterAnimator();
+        }
     }
 
     @Override
@@ -115,8 +166,9 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     public void onReceivedTitle(WebView view, String title) {
-        if (TextUtil.isEmpty(mTitle))
+        if (!isNoTitle() && TextUtil.isEmpty(mTitle)) {
             mTvTitle.setText(title);
+        }
     }
 
     @Override
@@ -151,6 +203,13 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     public void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+        if (mNavDisplay && mNavAnimate) {
+            if (scrollY > oldScrollY) {// to down
+                mNavBar.runExitAnimator();
+            } else {// to up
+                mNavBar.runEnterAnimator();
+            }
+        }
     }
 
     public static void startActivity(@NonNull Context context, @NonNull String url) {

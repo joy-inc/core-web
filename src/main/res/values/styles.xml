@@ -14,11 +14,8 @@
         <attr name="navIconBackground" format="reference" />
     </declare-styleable>
 
-    <style name="theme_web" parent="base_theme" />
-
-    <style name="theme_web.navigation">
-        <item name="noTitle">true</item>
-        <item name="navDisplay">true</item>
+    <style name="base_theme.web">
+        <item name="navDisplay">false</item>
         <item name="navAnimate">true</item>
         <item name="navHeight">@dimen/def_toolbar_height</item>
         <item name="navElevation">4dp</item>
