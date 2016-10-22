@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <declare-styleable name="Theme">
+        <attr name="longClickable" format="boolean" />
+    </declare-styleable>
+
     <declare-styleable name="NavigationBar">
         <attr name="navDisplay" format="boolean" />
         <attr name="navAnimate" format="boolean" />
@@ -18,7 +22,7 @@
         <item name="navDisplay">false</item>
         <item name="navAnimate">true</item>
         <item name="navHeight">@dimen/def_toolbar_height</item>
-        <item name="navElevation">4dp</item>
+        <item name="navElevation">@dimen/design_appbar_elevation</item>
         <item name="navBackgroundColor">?colorPrimary</item>
         <item name="navIconFirst">@drawable/ic_chevron_left_white_24dp</item>
         <item name="navIconSecond">@drawable/ic_close_white_24dp</item>

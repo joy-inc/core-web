@@ -58,7 +58,8 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     protected TextView mTvTitle;
     protected JoyShare mJoyShare;
     protected NavigationBar mNavBar;
-    protected boolean mNavDisplay = true;
+    protected boolean mLongClickable = true;
+    protected boolean mNavDisplay = false;
     protected boolean mNavAnimate = true;
     protected int mNavHeight;
     protected int mNavElevation;
@@ -69,7 +70,6 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
         component().inject(this);
         setContentView(mPresenter.getWebView());
-        addNavBarIfNecessary();
         mPresenter.load(mUrl);
     }
 
@@ -83,12 +83,41 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     @Override
     protected void resolveThemeAttribute() {
         super.resolveThemeAttribute();
-        TypedArray a = obtainStyledAttributes(R.styleable.NavigationBar);
-        mNavDisplay = a.getBoolean(R.styleable.NavigationBar_navDisplay, true);
-        mNavAnimate = a.getBoolean(R.styleable.NavigationBar_navAnimate, true);
-        mNavHeight = a.getDimensionPixelSize(R.styleable.NavigationBar_navHeight, 0);
-        mNavElevation = a.getDimensionPixelSize(R.styleable.NavigationBar_navElevation, 0);
-        a.recycle();
+        TypedArray themeTa = obtainStyledAttributes(R.styleable.Theme);
+        mLongClickable = themeTa.getBoolean(R.styleable.Theme_longClickable, true);
+        themeTa.recycle();
+
+        TypedArray navTa = obtainStyledAttributes(R.styleable.NavigationBar);
+        mNavDisplay = navTa.getBoolean(R.styleable.NavigationBar_navDisplay, false);
+        mNavAnimate = navTa.getBoolean(R.styleable.NavigationBar_navAnimate, true);
+        mNavHeight = navTa.getDimensionPixelSize(R.styleable.NavigationBar_navHeight, 0);
+        mNavElevation = navTa.getDimensionPixelSize(R.styleable.NavigationBar_navElevation, 0);
+        navTa.recycle();
+    }
+
+    @Override
+    protected void initData() {
+        mUrl = getIntent().getStringExtra(KEY_URL);
+        mTitle = getIntent().getStringExtra(KEY_TITLE);
+
+        mJoyShare = new JoyShare(this);
+        mJoyShare.setData(getShareItems());
+        mJoyShare.setOnItemClickListener(this::onShareItemClick);
+    }
+
+    @Override
+    protected void initTitleView() {
+        if (!isNoTitle()) {
+            addTitleLeftBackView();
+            addTitleRightMoreView((v) -> mJoyShare.show());
+            mTvTitle = addTitleMiddleView(mTitle);
+        }
+    }
+
+    @Override
+    protected void initContentView() {
+        mPresenter.getWebView().setOnLongClickListener((v) -> !mLongClickable);
+        addNavBarIfNecessary();
     }
 
     private void addNavBarIfNecessary() {
@@ -113,26 +142,6 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         navBar.findViewById(R.id.ivNav3).setOnClickListener((v1) -> mPresenter.goForward());
         navBar.findViewById(R.id.ivNav4).setOnClickListener((v1) -> mJoyShare.show());
         return navBar;
-    }
-
-    @Override
-    protected void initData() {
-        mUrl = getIntent().getStringExtra(KEY_URL);
-        mTitle = getIntent().getStringExtra(KEY_TITLE);
-        mPresenter.setUserAgent(getIntent().getStringExtra(KEY_USER_AGENT));
-
-        mJoyShare = new JoyShare(this);
-        mJoyShare.setData(getShareItems());
-        mJoyShare.setOnItemClickListener(this::onShareItemClick);
-    }
-
-    @Override
-    protected void initTitleView() {
-        if (!isNoTitle()) {
-            addTitleLeftBackView();
-            addTitleRightMoreView((v) -> mJoyShare.show());
-            mTvTitle = addTitleMiddleView(mTitle);
-        }
     }
 
     protected final BaseWebX5Presenter getPresenter() {
@@ -223,14 +232,9 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     }
 
     public static void startActivity(@NonNull Context context, @NonNull String url, @Nullable String title) {
-        startActivity(context, url, title, null);
-    }
-
-    public static void startActivity(@NonNull Context context, @NonNull String url, @Nullable String title, @Nullable String userAgent) {
         Intent intent = new Intent(context, BaseWebX5Activity.class);
         intent.putExtra(KEY_URL, url);
         intent.putExtra(KEY_TITLE, title);
-        intent.putExtra(KEY_USER_AGENT, userAgent);
         context.startActivity(intent);
     }
 }

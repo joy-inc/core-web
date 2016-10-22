@@ -7,5 +7,4 @@ package com.joy.webview.ui.interfaces;
 public interface KConstant {
     String KEY_URL = "KEY_URL";
     String KEY_TITLE = "KEY_TITLE";
-    String KEY_USER_AGENT = "KEY_USER_AGENT";
 }
