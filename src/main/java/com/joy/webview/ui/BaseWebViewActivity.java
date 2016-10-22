@@ -22,6 +22,7 @@ import com.joy.inject.module.ActivityModule;
 import com.joy.share.JoyShare;
 import com.joy.share.ShareItem;
 import com.joy.ui.activity.BaseHttpUiActivity;
+import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
 import com.joy.webview.R;
 import com.joy.webview.component.BaseWebViewComponent;
@@ -46,6 +47,8 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewWeb, KConstant {
 
+    protected final String TAG = getClass().getSimpleName();
+
     @Inject
     BaseWebViewPresenter mPresenter;
 
@@ -65,7 +68,6 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
 
         component().inject(this);
         setContentView(mPresenter.getWebView());
-        resolveThemeAttribute();// remove
         addNavBarIfNecessary();
         mPresenter.load(mUrl);
     }
@@ -77,8 +79,9 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
                 .build();
     }
 
-    //    @Override
+    @Override
     protected void resolveThemeAttribute() {
+        super.resolveThemeAttribute();
         TypedArray a = obtainStyledAttributes(R.styleable.NavigationBar);
         mNavDisplay = a.getBoolean(R.styleable.NavigationBar_navDisplay, true);
         mNavAnimate = a.getBoolean(R.styleable.NavigationBar_navAnimate, true);
@@ -154,6 +157,9 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
 
     @Override
     public void onPageFinished(WebView view, String url) {
+        if (LogMgr.DEBUG) {
+            LogMgr.d(TAG, "onPageFinished # url: " + url);
+        }
         if (mNavDisplay && mNavAnimate) {
             mNavBar.runEnterAnimator();
         }
