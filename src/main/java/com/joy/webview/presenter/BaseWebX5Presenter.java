@@ -48,6 +48,7 @@ public class BaseWebX5Presenter implements IPresenter {
     private Document mDocument;
     private boolean mIsError;
     private boolean mNeedSeedCookie;
+    private int mCurIndex;
 
     @Inject
     BaseWebX5Presenter() {
@@ -64,7 +65,9 @@ public class BaseWebX5Presenter implements IPresenter {
                 mBaseView.hideContent();
                 mBaseView.hideTipView();
                 mBaseView.showLoading();
-                mBaseView.onPageStarted(view, url, favicon);
+                if (!mNeedSeedCookie) {
+                    mBaseView.onPageStarted(view, url, favicon);
+                }
             }
 
             @Override
@@ -91,13 +94,18 @@ public class BaseWebX5Presenter implements IPresenter {
                     mBaseView.hideLoading();
                     mBaseView.hideTipView();
                     mBaseView.showContent();
+                    mCurIndex = mWebView.copyBackForwardList().getCurrentIndex();
                     getHtmlByTagName("html", 0);
                 }
             }
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                return mBaseView.onOverrideUrl(view, url);
+                boolean consumed = mBaseView.onOverrideUrl(view, url);
+                if (!consumed) {
+                    mCurIndex++;
+                }
+                return consumed;
             }
         });
         mWebView.setWebChromeClient(new WebChromeClient() {
@@ -214,6 +222,14 @@ public class BaseWebX5Presenter implements IPresenter {
         return mWebView.getUrl();
     }
 
+    public int getCurrentIndex() {
+        return mCurIndex;
+    }
+
+    public boolean isFirstPage() {
+        return mCurIndex == 0;
+    }
+
     @Override
     public void load(String url) {
         if (TextUtil.isNotEmpty(url)) {
@@ -245,6 +261,7 @@ public class BaseWebX5Presenter implements IPresenter {
 
     @Override
     public void goBack() {
+        mCurIndex = mWebView.copyBackForwardList().getCurrentIndex() - 1;
         if (canGoBack()) {
             mWebView.goBack();
         } else {

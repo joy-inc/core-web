@@ -12,7 +12,7 @@ ext {
     libraryName = "core-web"// 发布到JCenter上的项目名字
 }
 
-version = "0.0.8"// This is the library version used when deploying the artifact
+version = "0.1.0"// This is the library version used when deploying the artifact
 group = "com.joy.support"// Maven Group ID for the artifact，一般填你唯一的包名
 
 android {
@@ -22,7 +22,7 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.android.minSdkVersion
         targetSdkVersion rootProject.ext.android.targetSdkVersion
-        versionCode 8
+        versionCode 10
         versionName version
     }
     buildTypes {
@@ -38,6 +38,7 @@ android {
 }
 
 dependencies {
+//    compile project(':core-share')
     compile rootProject.ext.dependencies.joy_core_share
     compile rootProject.ext.dependencies.joy_x5_download
     compile rootProject.ext.dependencies.jsoup

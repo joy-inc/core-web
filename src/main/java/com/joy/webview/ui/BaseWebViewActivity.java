@@ -1,5 +1,6 @@
 package com.joy.webview.ui;
 
+import android.animation.LayoutTransition;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
@@ -31,6 +32,7 @@ import com.joy.webview.module.BaseWebViewModule;
 import com.joy.webview.presenter.BaseWebViewPresenter;
 import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.joy.webview.ui.interfaces.KConstant;
+import com.joy.webview.utils.AnimatorUtils;
 import com.joy.webview.view.NavigationBar;
 
 import java.util.List;
@@ -55,13 +57,15 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     protected String mUrl;
     protected String mTitle;
     protected TextView mTvTitle;
+    protected TextView mTvTitleClose;
     protected JoyShare mJoyShare;
     protected NavigationBar mNavBar;
-    protected boolean mLongClickable = true;
     protected boolean mNavDisplay = false;
     protected boolean mNavAnimate = true;
     protected int mNavHeight;
     protected int mNavElevation;
+
+    protected boolean mLongClickable = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,9 +111,17 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     @Override
     protected void initTitleView() {
         if (!isNoTitle()) {
-            addTitleLeftBackView();
+            addTitleLeftBackView((v) -> mPresenter.goBack());
+            mTvTitleClose = addTitleMiddleView(R.string.close, (v) -> finish());
+            goneView(mTvTitleClose);
             addTitleRightMoreView((v) -> mJoyShare.show());
             mTvTitle = addTitleMiddleView(mTitle);
+            if (TextUtil.isEmpty(mTitle)) {
+                mTvTitle.setAlpha(0.f);
+            }
+            LayoutTransition lt = new LayoutTransition();
+            lt.setDuration(300);
+            getToolbar().setLayoutTransition(lt);
         }
     }
 
@@ -162,6 +174,13 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
+        if (!isNoTitle()) {
+            if (mPresenter.isFirstPage()) {
+                goneView(mTvTitleClose);
+            } else {
+                showView(mTvTitleClose);
+            }
+        }
     }
 
     @Override
@@ -181,7 +200,7 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     @Override
     public void onReceivedTitle(WebView view, String title) {
         if (!isNoTitle() && TextUtil.isEmpty(mTitle)) {
-            mTvTitle.setText(title);
+            AnimatorUtils.fadeIn(mTvTitle, title);
         }
     }
 
