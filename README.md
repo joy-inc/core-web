@@ -30,7 +30,7 @@ Ivy:
 </dependency>
 ```
 
-## Example
+## Initialize (optional)
 
 ```
 public class JoyApplication extends Application {
