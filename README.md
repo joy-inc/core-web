@@ -1,8 +1,9 @@
-### core-web
+
+# core-web
 
 Android Webkit + Tencent X5 Webkit
 
-### Add core-web to your project
+## Add core-web to your project
 
 Gradle:
 
@@ -29,7 +30,7 @@ Ivy:
 </dependency>
 ```
 
-### Example
+## Example
 
 ```
 public class JoyApplication extends Application {
@@ -49,7 +50,7 @@ public class JoyApplication extends Application {
 }
 ```
 
-### StartActivity
+## StartActivity
 
 **BaseWebViewActivity**
 
@@ -65,7 +66,7 @@ BaseWebX5Activity.startActivity(@NonNull Context context, @NonNull String url);
 BaseWebX5Activity.startActivity(@NonNull Context context, @NonNull String url, @Nullable String title);
 ```
 
-### Theme
+## Theme
 
 **Network: loadingView / errorTip / emptyTip**
 
