@@ -17,6 +17,7 @@ import android.webkit.WebChromeClient.CustomViewCallback;
 import android.webkit.WebChromeClient.FileChooserParams;
 import android.webkit.WebView;
 import android.widget.FrameLayout.LayoutParams;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.joy.inject.module.ActivityModule;
@@ -55,9 +56,10 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     BaseWebViewPresenter mPresenter;
 
     protected String mUrl;
-    protected String mTitle;
+    protected CharSequence mTitle;
     protected TextView mTvTitle;
     protected TextView mTvTitleClose;
+    protected ImageButton mIbTitleMore;
     protected JoyShare mJoyShare;
     protected NavigationBar mNavBar;
     protected boolean mNavDisplay = false;
@@ -101,7 +103,7 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     @Override
     protected void initData() {
         mUrl = getIntent().getStringExtra(KEY_URL);
-        mTitle = getIntent().getStringExtra(KEY_TITLE);
+        mTitle = getIntent().getCharSequenceExtra(KEY_TITLE);
 
         mJoyShare = new JoyShare(this);
         mJoyShare.setData(getShareItems());
@@ -112,9 +114,9 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     protected void initTitleView() {
         if (!isNoTitle()) {
             addTitleLeftBackView((v) -> mPresenter.goBack());
-            mTvTitleClose = addTitleMiddleView(R.string.close, (v) -> finish());
+            mTvTitleClose = addTitleLeftTextView(R.string.close, (v) -> finish());
             goneView(mTvTitleClose);
-            addTitleRightMoreView((v) -> mJoyShare.show());
+            mIbTitleMore = addTitleRightMoreView((v) -> onTitleMoreClick());
             mTvTitle = addTitleMiddleView(mTitle);
             if (TextUtil.isEmpty(mTitle)) {
                 mTvTitle.setAlpha(0.f);
@@ -129,6 +131,16 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     protected void initContentView() {
         mPresenter.getWebView().setOnLongClickListener((v) -> !mLongClickable);
         addNavBarIfNecessary();
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        AnimatorUtils.fadeIn(mTvTitle, title);
+    }
+
+    protected void onTitleMoreClick() {
+        mJoyShare.show();
     }
 
     private void addNavBarIfNecessary() {
@@ -200,7 +212,7 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     @Override
     public void onReceivedTitle(WebView view, String title) {
         if (!isNoTitle() && TextUtil.isEmpty(mTitle)) {
-            AnimatorUtils.fadeIn(mTvTitle, title);
+            setTitle(title);
         }
     }
 
@@ -245,11 +257,16 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        mPresenter.goBack();
+    }
+
     public static void startActivity(@NonNull Context context, @NonNull String url) {
         startActivity(context, url, null);
     }
 
-    public static void startActivity(@NonNull Context context, @NonNull String url, @Nullable String title) {
+    public static void startActivity(@NonNull Context context, @NonNull String url, @Nullable CharSequence title) {
         Intent intent = new Intent(context, BaseWebViewActivity.class);
         intent.putExtra(KEY_URL, url);
         intent.putExtra(KEY_TITLE, title);

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -73,8 +74,8 @@ public class BaseWebX5Presenter implements IPresenter {
             @Override
             public void onReceivedError(WebView view, WebResourceRequest resourceRequest, WebViewClient.a a) {
                 if (mNeedSeedCookie) {
-                    mWebView.loadUrl(mInitialUrl);
                     mNeedSeedCookie = false;
+                    mWebView.loadUrl(mInitialUrl);
                 } else {
                     mIsError = true;
                     mBaseView.hideLoading();
@@ -87,14 +88,18 @@ public class BaseWebX5Presenter implements IPresenter {
             @Override
             public void onPageFinished(WebView view, String url) {
                 if (mNeedSeedCookie) {
+                    mNeedSeedCookie = false;
                     JoyWeb.mIsCookieSeeded = true;
                     mWebView.loadUrl(mInitialUrl);
-                    mNeedSeedCookie = false;
                 } else if (!mIsError) {
                     mBaseView.hideLoading();
                     mBaseView.hideTipView();
                     mBaseView.showContent();
                     mCurIndex = mWebView.copyBackForwardList().getCurrentIndex();
+                    if (url.equals(mInitialUrl) && mCurIndex != 0) {
+                        mWebView.clearHistory();
+                        mCurIndex = mWebView.copyBackForwardList().getCurrentIndex();
+                    }
                     getHtmlByTagName("html", 0);
                 }
             }
@@ -188,16 +193,19 @@ public class BaseWebX5Presenter implements IPresenter {
         return mDocument;
     }
 
+    @Nullable
     @Override
     public Elements getElementsByTag(String tagName) {
         return DocumentParser.getElementsByTag(mDocument, tagName);
     }
 
+    @Nullable
     @Override
     public Element getElementByTag(String tagName, int index) {
         return DocumentParser.getElementByTag(mDocument, tagName, index);
     }
 
+    @Nullable
     @Override
     public Element getFirstElementByTag(String tagName) {
         return DocumentParser.getFirstElementByTag(mDocument, tagName);

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="Theme">
+        <attr name="longClickable" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="NavigationBar">
+        <attr name="navDisplay" format="boolean" />
+        <attr name="navAnimate" format="boolean" />
+        <attr name="navHeight" format="dimension" />
+        <attr name="navElevation" format="dimension" />
+        <attr name="navBackgroundColor" format="color" />
+        <attr name="navIconFirst" format="reference" />
+        <attr name="navIconSecond" format="reference" />
+        <attr name="navIconThird" format="reference" />
+        <attr name="navIconFourth" format="reference" />
+        <attr name="navIconBackground" format="reference" />
+    </declare-styleable>
+</resources>

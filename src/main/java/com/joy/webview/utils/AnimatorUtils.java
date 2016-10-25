@@ -9,14 +9,16 @@ import android.widget.TextView;
 
 public class AnimatorUtils {
 
-    public static void fadeIn(TextView tv, String text) {
-        tv.setText(text);
-        if (tv.getAlpha() != 1.f) {
-            tv.animate()
-                    .alpha(1.f)
-                    .setDuration(200)
-                    .setInterpolator(new LinearInterpolator())
-                    .start();
+    public static void fadeIn(TextView tv, CharSequence title) {
+        if (tv != null) {
+            tv.setText(title);
+            if (tv.getAlpha() != 1.f) {
+                tv.animate()
+                        .alpha(1.f)
+                        .setDuration(200)
+                        .setInterpolator(new LinearInterpolator())
+                        .start();
+            }
         }
     }
 }

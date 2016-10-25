@@ -11,7 +11,7 @@
         <item name="navIconSecond">@drawable/ic_close_white_24dp</item>
         <item name="navIconThird">@drawable/ic_chevron_right_white_24dp</item>
         <item name="navIconFourth">@drawable/ic_more_horiz_white_24dp</item>
-        <item name="navIconBackground">@drawable/selector_bg_click</item>
+        <item name="navIconBackground">@drawable/control_background_52dp_material</item>
     </style>
 
 </resources>

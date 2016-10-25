@@ -1,5 +1,7 @@
 package com.joy.webview.utils;
 
+import android.support.annotation.Nullable;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -12,6 +14,7 @@ import static com.joy.utils.TextUtil.TEXT_EMPTY;
 
 public class DocumentParser {
 
+    @Nullable
     public static Elements getElementsByTag(Document document, String tagName) {
         if (document != null) {
             return document.getElementsByTag(tagName);
@@ -19,10 +22,17 @@ public class DocumentParser {
         return null;
     }
 
+    @Nullable
     public static Element getElementByTag(Document document, String tagName, int index) {
-        return getElementsByTag(document, tagName).get(index);
+        try {
+            return getElementsByTag(document, tagName).get(index);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
+    @Nullable
     public static Element getFirstElementByTag(Document document, String tagName) {
         return getElementByTag(document, tagName, 0);
     }
