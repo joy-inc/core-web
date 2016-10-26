@@ -25,7 +25,10 @@ public class DocumentParser {
     @Nullable
     public static Element getElementByTag(Document document, String tagName, int index) {
         try {
-            return getElementsByTag(document, tagName).get(index);
+            Elements elements = getElementsByTag(document, tagName);
+            if (elements != null && elements.size() > index) {
+                return elements.get(index);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

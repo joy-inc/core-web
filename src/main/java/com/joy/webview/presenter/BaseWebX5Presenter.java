@@ -96,6 +96,9 @@ public class BaseWebX5Presenter implements IPresenter {
                     mBaseView.hideTipView();
                     mBaseView.showContent();
                     mCurIndex = mWebView.copyBackForwardList().getCurrentIndex();
+                    if (mCurIndex == 1 && TextUtil.isNotEmpty(mInitialUrl) && !url.equals(mInitialUrl)) {
+                        mInitialUrl = url;// 当加载过cookieUrl，并且initialUrl被重定向了，这时把重定向后的URL赋给initialUrl。
+                    }
                     if (url.equals(mInitialUrl) && mCurIndex != 0) {
                         mWebView.clearHistory();
                         mCurIndex = mWebView.copyBackForwardList().getCurrentIndex();
@@ -159,6 +162,8 @@ public class BaseWebX5Presenter implements IPresenter {
                 return mBaseView.onShowFileChooser(webView, filePathCallback, fileChooserParams);
             }
         });
+        mWebView.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength)
+                -> mBaseView.onDownloadStart(url, userAgent, contentDisposition, mimetype, contentLength));
         mWebView.addJavascriptInterface(new JSHtmlSource() {
             @JavascriptInterface
             @WorkerThread
@@ -235,7 +240,7 @@ public class BaseWebX5Presenter implements IPresenter {
     }
 
     public boolean isFirstPage() {
-        return mCurIndex == 0;
+        return mCurIndex <= 0;
     }
 
     @Override

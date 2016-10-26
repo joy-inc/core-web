@@ -233,6 +233,10 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     public void onHideCustomView() {
     }
 
+    @Override
+    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+    }
+
     // file upload callback for 3.0 ~ 5.0
     @Override
     @TargetApi(HONEYCOMB)

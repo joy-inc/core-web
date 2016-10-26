@@ -248,6 +248,10 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     }
 
     @Override
+    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+    }
+
+    @Override
     public void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
         if (mNavDisplay && mNavAnimate) {
             if (scrollY > oldScrollY) {// to down

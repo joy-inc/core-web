@@ -38,6 +38,9 @@ public interface BaseViewWebX5 extends BaseViewNet {
 
     void onHideCustomView();
 
+    void onDownloadStart(String url, String userAgent,
+                         String contentDisposition, String mimetype, long contentLength);
+
     @TargetApi(HONEYCOMB)
     void onShowFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, @Nullable String capture);
 
