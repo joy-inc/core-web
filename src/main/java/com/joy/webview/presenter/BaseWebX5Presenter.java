@@ -9,6 +9,7 @@ import android.support.annotation.WorkerThread;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 
+import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
 import com.joy.webview.ui.interfaces.BaseViewWebX5;
@@ -25,6 +26,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -50,9 +54,11 @@ public class BaseWebX5Presenter implements IPresenter {
     private boolean mIsError;
     private boolean mNeedSeedCookie;
     private int mCurIndex;
+    private Map<String, Boolean> mSessionFinished;
 
     @Inject
     BaseWebX5Presenter() {
+        mSessionFinished = new HashMap<>();
     }
 
     @Inject
@@ -62,6 +68,12 @@ public class BaseWebX5Presenter implements IPresenter {
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                String prevUrl = view.getUrl();
+                boolean isRedirected = mSessionFinished.get(prevUrl) != null && !mSessionFinished.get(prevUrl);
+                if (isRedirected) {// 如果initialUrl被重定向了，则跳出方法体。
+                    return;
+                }
+                mSessionFinished.put(url, false);
                 mIsError = false;
                 mBaseView.hideContent();
                 mBaseView.hideTipView();
@@ -73,6 +85,8 @@ public class BaseWebX5Presenter implements IPresenter {
 
             @Override
             public void onReceivedError(WebView view, WebResourceRequest resourceRequest, WebViewClient.a a) {
+                String failingUrl = resourceRequest.getUrl().toString();
+                mSessionFinished.put(failingUrl, true);
                 if (mNeedSeedCookie) {
                     mNeedSeedCookie = false;
                     mWebView.loadUrl(mInitialUrl);
@@ -87,15 +101,22 @@ public class BaseWebX5Presenter implements IPresenter {
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                mSessionFinished.put(url, true);
+                if (!url.equals(view.getUrl())) {// 如果当前URL和webview所持有的URL不一致时，抛掉当前URL的回调，跳出方法体。
+                    return;
+                }
                 if (mNeedSeedCookie) {
                     mNeedSeedCookie = false;
                     JoyWeb.mIsCookieSeeded = true;
                     mWebView.loadUrl(mInitialUrl);
                 } else if (!mIsError) {
+                    mCurIndex = mWebView.copyBackForwardList().getCurrentIndex();
+                    if (mCurIndex == -1) {
+                        return;
+                    }
                     mBaseView.hideLoading();
                     mBaseView.hideTipView();
                     mBaseView.showContent();
-                    mCurIndex = mWebView.copyBackForwardList().getCurrentIndex();
                     if (mCurIndex == 1 && TextUtil.isNotEmpty(mInitialUrl) && !url.equals(mInitialUrl)) {
                         mInitialUrl = url;// 当加载过cookieUrl，并且initialUrl被重定向了，这时把重定向后的URL赋给initialUrl。
                     }
@@ -109,6 +130,12 @@ public class BaseWebX5Presenter implements IPresenter {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                String prevUrl = view.getUrl();
+                boolean isAutoRedirect = mSessionFinished.get(prevUrl) != null && !mSessionFinished.get(prevUrl);
+                if (isAutoRedirect) {// 如果是自动重定向，则交给webview处理。
+                    LogMgr.d("core-web", "BaseWebViewPresenter shouldOverrideUrlLoading # auto redirect");
+                    return false;
+                }
                 boolean consumed = mBaseView.onOverrideUrl(view, url);
                 if (!consumed) {
                     mCurIndex++;
@@ -235,6 +262,12 @@ public class BaseWebX5Presenter implements IPresenter {
         return mWebView.getUrl();
     }
 
+    /**
+     * Get the index of the current history item. This index can be used to
+     * directly index into the array list.
+     *
+     * @return The current index from 0...n or -1 if the list is empty.
+     */
     public int getCurrentIndex() {
         return mCurIndex;
     }
@@ -285,6 +318,7 @@ public class BaseWebX5Presenter implements IPresenter {
     @Override
     public void goForward() {
         if (canGoForward()) {
+            mCurIndex++;
             mWebView.goForward();
         }
     }

@@ -51,7 +51,7 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWebX5, KConstant {
 
-    protected final String TAG = getClass().getSimpleName();
+    protected final String classSimpleName = getClass().getSimpleName();
 
     @Inject
     BaseWebX5Presenter mPresenter;
@@ -187,6 +187,9 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
+        if (LogMgr.DEBUG) {
+            LogMgr.d("core-web", classSimpleName + " onPageStarted # currentPageIndex: " + mPresenter.getCurrentIndex() + " url: " + url);
+        }
         if (!isNoTitle()) {
             if (mPresenter.isFirstPage()) {
                 goneView(mTvTitleClose);
@@ -199,7 +202,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     @Override
     public void onPageFinished(WebView view, String url) {
         if (LogMgr.DEBUG) {
-            LogMgr.d(TAG, "onPageFinished # url: " + url);
+            LogMgr.d("core-web", classSimpleName + " onPageFinished # url: " + url);
         }
         if (mNavDisplay && mNavAnimate) {
             mNavBar.runEnterAnimator();
@@ -208,6 +211,9 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     public void onReceivedError(WebView view, WebResourceRequest resourceRequest) {
+        if (LogMgr.DEBUG) {
+            LogMgr.d("core-web", classSimpleName + " onReceivedError # failingUrl: " + resourceRequest.getUrl().toString());
+        }
     }
 
     @Override
@@ -234,6 +240,10 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     public void onHideCustomView() {
     }
 
+    @Override
+    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+    }
+
     // file upload callback for 3.0 ~ 5.0
     @Override
     @TargetApi(HONEYCOMB)
@@ -245,10 +255,6 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     @TargetApi(LOLLIPOP)
     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
         return false;
-    }
-
-    @Override
-    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
     }
 
     @Override

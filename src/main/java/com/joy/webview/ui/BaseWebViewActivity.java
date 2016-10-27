@@ -50,7 +50,7 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewWeb, KConstant {
 
-    protected final String TAG = getClass().getSimpleName();
+    protected final String classSimpleName = getClass().getSimpleName();
 
     @Inject
     BaseWebViewPresenter mPresenter;
@@ -186,6 +186,9 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
+        if (LogMgr.DEBUG) {
+            LogMgr.d("core-web", classSimpleName + " onPageStarted # currentPageIndex: " + mPresenter.getCurrentIndex() + " url: " + url);
+        }
         if (!isNoTitle()) {
             if (mPresenter.isFirstPage()) {
                 goneView(mTvTitleClose);
@@ -198,7 +201,7 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     @Override
     public void onPageFinished(WebView view, String url) {
         if (LogMgr.DEBUG) {
-            LogMgr.d(TAG, "onPageFinished # url: " + url);
+            LogMgr.d("core-web", classSimpleName + " onPageFinished # url: " + url);
         }
         if (mNavDisplay && mNavAnimate) {
             mNavBar.runEnterAnimator();
@@ -207,6 +210,9 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
 
     @Override
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        if (LogMgr.DEBUG) {
+            LogMgr.d("core-web", classSimpleName + " onReceivedError # errorCode: " + errorCode + " description: " + description + " failingUrl: " + failingUrl);
+        }
     }
 
     @Override
