@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 import android.webkit.CookieManager;
 
 import com.joy.ui.BaseApplication;
+import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
 
 import static android.os.Build.VERSION.SDK_INT;
@@ -94,5 +95,9 @@ public class JoyWeb {
 
     public static void setAppCacheMaxSize(long appCacheMaxSize) {
         mAppCacheMaxSize = appCacheMaxSize;
+    }
+
+    public static void setLogcatDisable(boolean disable) {
+        LogMgr.DEBUG = disable;
     }
 }

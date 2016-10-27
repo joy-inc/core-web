@@ -2,16 +2,19 @@
 <resources>
 
     <style name="base_theme.web">
+        <item name="titleMoreEnable">true</item>
+        <item name="titleCloseEnable">true</item>
         <item name="navDisplay">false</item>
         <item name="navAnimate">true</item>
         <item name="navHeight">@dimen/def_toolbar_height</item>
         <item name="navElevation">@dimen/design_appbar_elevation</item>
-        <item name="navBackgroundColor">?colorPrimary</item>
-        <item name="navIconFirst">@drawable/ic_chevron_left_white_24dp</item>
-        <item name="navIconSecond">@drawable/ic_close_white_24dp</item>
-        <item name="navIconThird">@drawable/ic_chevron_right_white_24dp</item>
-        <item name="navIconFourth">@drawable/ic_more_horiz_white_24dp</item>
-        <item name="navIconBackground">@drawable/selector_bg_click</item>
+        <item name="navBackgroundColor">@color/white</item>
+        <item name="navIconFirst">@drawable/ic_chevron_left_black_24dp</item>
+        <item name="navIconSecond">@drawable/ic_close_black_24dp</item>
+        <item name="navIconThird">@drawable/ic_chevron_right_black_24dp</item>
+        <item name="navIconFourth">@drawable/ic_more_horiz_black_24dp</item>
+        <item name="navIconAlpha">0.55</item>
+        <item name="navIconBackground">@drawable/selector_bg_click_dark</item>
     </style>
 
 </resources>

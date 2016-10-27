@@ -7,8 +7,10 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.ViewPropertyAnimator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.joy.utils.ViewUtil;
 import com.joy.webview.R;
 
 /**
@@ -34,6 +36,26 @@ public class NavigationBar extends LinearLayout {
     public NavigationBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         resolveThemeAttribute(context);
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        ImageView ivNav1 = (ImageView) findViewById(R.id.ivNav1);
+        ImageView ivNav2 = (ImageView) findViewById(R.id.ivNav2);
+        ImageView ivNav3 = (ImageView) findViewById(R.id.ivNav3);
+        ImageView ivNav4 = (ImageView) findViewById(R.id.ivNav4);
+        if (ivNav1.getDrawable() == null) {
+            ViewUtil.goneView(ivNav1);
+        }
+        if (ivNav2.getDrawable() == null) {
+            ViewUtil.goneView(ivNav2);
+        }
+        if (ivNav3.getDrawable() == null) {
+            ViewUtil.goneView(ivNav3);
+        }
+        if (ivNav4.getDrawable() == null) {
+            ViewUtil.goneView(ivNav4);
+        }
     }
 
     private void resolveThemeAttribute(Context context) {

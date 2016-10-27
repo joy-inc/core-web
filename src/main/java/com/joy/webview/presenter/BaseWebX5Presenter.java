@@ -272,10 +272,6 @@ public class BaseWebX5Presenter implements IPresenter {
         return mCurIndex;
     }
 
-    public boolean isFirstPage() {
-        return mCurIndex <= 0;
-    }
-
     @Override
     public void load(String url) {
         if (TextUtil.isNotEmpty(url)) {

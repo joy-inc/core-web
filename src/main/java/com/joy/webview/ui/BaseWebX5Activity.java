@@ -1,6 +1,5 @@
 package com.joy.webview.ui;
 
-import android.animation.LayoutTransition;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
@@ -59,8 +58,10 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     protected String mUrl;
     protected CharSequence mTitle;
     protected TextView mTvTitle;
-    protected TextView mTvTitleClose;
+    protected boolean mTitleMoreEnable;
+    protected boolean mTitleCloseEnable;
     protected ImageButton mIbTitleMore;
+    protected ImageButton mIbTitleClose;
     protected JoyShare mJoyShare;
     protected NavigationBar mNavBar;
     protected boolean mNavDisplay = false;
@@ -91,6 +92,8 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         super.resolveThemeAttribute();
         TypedArray themeTa = obtainStyledAttributes(R.styleable.Theme);
         mLongClickable = themeTa.getBoolean(R.styleable.Theme_longClickable, true);
+        mTitleMoreEnable = themeTa.getBoolean(R.styleable.Theme_titleMoreEnable, true);
+        mTitleCloseEnable = themeTa.getBoolean(R.styleable.Theme_titleCloseEnable, true);
         themeTa.recycle();
 
         TypedArray navTa = obtainStyledAttributes(R.styleable.NavigationBar);
@@ -115,16 +118,20 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     protected void initTitleView() {
         if (!isNoTitle()) {
             addTitleLeftBackView((v) -> mPresenter.goBack());
-            mTvTitleClose = addTitleLeftTextView(R.string.close, (v) -> finish());
-            goneView(mTvTitleClose);
-            mIbTitleMore = addTitleRightMoreView((v) -> onTitleMoreClick());
+            if (mTitleMoreEnable) {
+                mIbTitleMore = addTitleRightMoreView((v) -> onTitleMoreClick());
+            }
+            if (mTitleCloseEnable) {
+                mIbTitleClose = addTitleRightView(R.drawable.ic_close_white_24dp, (v) -> finish());
+            }
+            if (mTitleMoreEnable && mTitleCloseEnable) {
+                mIbTitleMore.setMinimumWidth(DP_1_PX * 40);
+                mIbTitleClose.setMinimumWidth(DP_1_PX * 40);
+            }
             mTvTitle = addTitleMiddleView(mTitle);
             if (TextUtil.isEmpty(mTitle)) {
                 mTvTitle.setAlpha(0.f);
             }
-            LayoutTransition lt = new LayoutTransition();
-            lt.setDuration(300);
-            getToolbar().setLayoutTransition(lt);
         }
     }
 
@@ -189,13 +196,6 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
         if (LogMgr.DEBUG) {
             LogMgr.d("core-web", classSimpleName + " onPageStarted # currentPageIndex: " + mPresenter.getCurrentIndex() + " url: " + url);
-        }
-        if (!isNoTitle()) {
-            if (mPresenter.isFirstPage()) {
-                goneView(mTvTitleClose);
-            } else {
-                showView(mTvTitleClose);
-            }
         }
     }
 
