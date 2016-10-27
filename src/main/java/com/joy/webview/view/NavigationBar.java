@@ -44,16 +44,16 @@ public class NavigationBar extends LinearLayout {
         ImageView ivNav2 = (ImageView) findViewById(R.id.ivNav2);
         ImageView ivNav3 = (ImageView) findViewById(R.id.ivNav3);
         ImageView ivNav4 = (ImageView) findViewById(R.id.ivNav4);
-        if (ivNav1.getDrawable() == null) {
+        if (ivNav1 != null && ivNav1.getDrawable() == null) {
             ViewUtil.goneView(ivNav1);
         }
-        if (ivNav2.getDrawable() == null) {
+        if (ivNav2 != null && ivNav2.getDrawable() == null) {
             ViewUtil.goneView(ivNav2);
         }
-        if (ivNav3.getDrawable() == null) {
+        if (ivNav3 != null && ivNav3.getDrawable() == null) {
             ViewUtil.goneView(ivNav3);
         }
-        if (ivNav4.getDrawable() == null) {
+        if (ivNav4 != null && ivNav4.getDrawable() == null) {
             ViewUtil.goneView(ivNav4);
         }
     }

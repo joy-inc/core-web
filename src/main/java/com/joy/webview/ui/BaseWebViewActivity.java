@@ -119,6 +119,7 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
             addTitleLeftBackView((v) -> mPresenter.goBack());
             if (mTitleMoreEnable) {
                 mIbTitleMore = addTitleRightMoreView((v) -> onTitleMoreClick());
+                mIbTitleMore.setAlpha(0.f);
             }
             if (mTitleCloseEnable) {
                 mIbTitleClose = addTitleRightView(R.drawable.ic_close_white_24dp, (v) -> finish());
@@ -144,6 +145,10 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     public void setTitle(CharSequence title) {
         mTitle = title;
         AnimatorUtils.fadeIn(mTvTitle, title);
+    }
+
+    protected void fadeInTitleMore() {
+        AnimatorUtils.fadeIn(mIbTitleMore);
     }
 
     protected void onTitleMoreClick() {
@@ -203,6 +208,7 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
         if (LogMgr.DEBUG) {
             LogMgr.d("core-web", classSimpleName + " onPageFinished # url: " + url);
         }
+        fadeInTitleMore();
         if (mNavDisplay && mNavAnimate) {
             mNavBar.runEnterAnimator();
         }
