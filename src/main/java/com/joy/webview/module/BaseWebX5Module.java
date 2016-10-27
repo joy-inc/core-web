@@ -63,6 +63,10 @@ public class BaseWebX5Module {
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setAllowFileAccess(true);
+        settings.setDomStorageEnabled(true);
+
+        settings.setUseWideViewPort(true);
+        settings.setLoadWithOverviewMode(true);
 
         settings.setSupportZoom(false);
         settings.setBuiltInZoomControls(false);
@@ -72,6 +76,11 @@ public class BaseWebX5Module {
         if (TextUtil.isNotEmpty(userAgent)) {
             settings.setUserAgentString(settings.getUserAgentString() + " " + userAgent);
         }
+
+        settings.setAppCacheEnabled(JoyWeb.isAppCacheEnabled());
+        settings.setAppCachePath(JoyWeb.getAppCachePath());
+        settings.setAppCacheMaxSize(JoyWeb.getAppCacheMaxSize());
+        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         return webView;
     }

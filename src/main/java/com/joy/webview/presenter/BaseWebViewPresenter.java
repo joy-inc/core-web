@@ -104,7 +104,7 @@ public class BaseWebViewPresenter implements IPresenter {
                 }
                 if (mNeedSeedCookie) {
                     mNeedSeedCookie = false;
-                    JoyWeb.mIsCookieSeeded = true;
+                    JoyWeb.setCookieSeeded(true);
                     mWebView.loadUrl(mInitialUrl);
                 } else if (!mIsError) {
                     mCurIndex = mWebView.copyBackForwardList().getCurrentIndex();
@@ -276,7 +276,7 @@ public class BaseWebViewPresenter implements IPresenter {
     public void load(String url) {
         if (TextUtil.isNotEmpty(url)) {
             String cookie = JoyWeb.getCookie();
-            mNeedSeedCookie = TextUtil.isNotEmpty(cookie) && !JoyWeb.mIsCookieSeeded;
+            mNeedSeedCookie = TextUtil.isNotEmpty(cookie) && !JoyWeb.isCookieSeeded();
             if (mNeedSeedCookie) {
                 mInitialUrl = url;
                 mWebView.loadUrl(cookie);

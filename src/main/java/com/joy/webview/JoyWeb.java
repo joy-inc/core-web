@@ -3,6 +3,7 @@ package com.joy.webview;
 import android.support.annotation.Nullable;
 import android.webkit.CookieManager;
 
+import com.joy.ui.BaseApplication;
 import com.joy.utils.TextUtil;
 
 import static android.os.Build.VERSION.SDK_INT;
@@ -15,8 +16,13 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 public class JoyWeb {
 
     private static String mUserAgent;
+
     private static String mCookie;
-    public static boolean mIsCookieSeeded;
+    private static boolean mCookieSeeded;
+
+    private static boolean mAppCacheEnabled = true;
+    private static String mAppCachePath = BaseApplication.getContext().getExternalCacheDir().toString();
+    private static long mAppCacheMaxSize = 1024 * 1024 * 8;// 8M
 
     public static void setUserAgent(@Nullable String userAgent) {
         mUserAgent = userAgent;
@@ -41,14 +47,23 @@ public class JoyWeb {
 
     public static void clearCookie() {
         mCookie = null;
-        mIsCookieSeeded = false;
+        mCookieSeeded = false;
         removeAllCookies();
+    }
+
+    public static boolean isCookieSeeded() {
+        return mCookieSeeded;
+    }
+
+    public static void setCookieSeeded(boolean cookieSeeded) {
+        mCookieSeeded = cookieSeeded;
     }
 
     private static void removeAllCookies() {
         try {
             if (SDK_INT >= LOLLIPOP) {
-                CookieManager.getInstance().removeAllCookies(value -> {});
+                CookieManager.getInstance().removeAllCookies(value -> {
+                });
             } else {
                 CookieManager.getInstance().removeAllCookie();
             }
@@ -57,9 +72,27 @@ public class JoyWeb {
         }
     }
 
-    public static void release() {
-        mUserAgent = null;
-        mCookie = null;
-        mIsCookieSeeded = false;
+    public static boolean isAppCacheEnabled() {
+        return mAppCacheEnabled;
+    }
+
+    public static void setAppCacheEnabled(boolean appCacheEnabled) {
+        mAppCacheEnabled = appCacheEnabled;
+    }
+
+    public static String getAppCachePath() {
+        return mAppCachePath;
+    }
+
+    public static void setAppCachePath(String appCachePath) {
+        mAppCachePath = appCachePath;
+    }
+
+    public static long getAppCacheMaxSize() {
+        return mAppCacheMaxSize;
+    }
+
+    public static void setAppCacheMaxSize(long appCacheMaxSize) {
+        mAppCacheMaxSize = appCacheMaxSize;
     }
 }
