@@ -19,6 +19,7 @@ import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
 import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.joy.webview.utils.DocumentParser;
+import com.joy.webview.utils.PayIntercepter;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -133,11 +134,14 @@ public class BaseWebViewPresenter implements IPresenter {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (PayIntercepter.interceptPayIntent(view.getContext(), url)) {
+                    return true;
+                }
                 String prevUrl = view.getUrl();
                 boolean isAutoRedirect = mSessionFinished.get(prevUrl) != null && !mSessionFinished.get(prevUrl);
                 if (isAutoRedirect) {// 如果是自动重定向，则交给webview处理。
                     LogMgr.d("core-web", "BaseWebViewPresenter shouldOverrideUrlLoading # auto redirect");
-                    return false;
+                    return super.shouldOverrideUrlLoading(view, url);
                 }
                 boolean consumed = mBaseView.onOverrideUrl(view, url);
                 if (!consumed) {

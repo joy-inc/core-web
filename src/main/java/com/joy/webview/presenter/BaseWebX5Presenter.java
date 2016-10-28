@@ -14,6 +14,7 @@ import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
 import com.joy.webview.ui.interfaces.BaseViewWebX5;
 import com.joy.webview.utils.DocumentParser;
+import com.joy.webview.utils.PayIntercepter;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient.CustomViewCallback;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.ValueCallback;
@@ -136,11 +137,14 @@ public class BaseWebX5Presenter implements IPresenter {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (PayIntercepter.interceptPayIntent(view.getContext(), url)) {
+                    return true;
+                }
                 String prevUrl = view.getUrl();
                 boolean isAutoRedirect = mSessionFinished.get(prevUrl) != null && !mSessionFinished.get(prevUrl);
                 if (isAutoRedirect) {// 如果是自动重定向，则交给webview处理。
-                    LogMgr.d("core-web", "BaseWebViewPresenter shouldOverrideUrlLoading # auto redirect");
-                    return false;
+                    LogMgr.d("core-web", "BaseWebX5Presenter shouldOverrideUrlLoading # auto redirect");
+                    return super.shouldOverrideUrlLoading(view, url);
                 }
                 boolean consumed = mBaseView.onOverrideUrl(view, url);
                 if (!consumed) {

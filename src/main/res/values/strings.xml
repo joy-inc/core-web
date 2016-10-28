@@ -1,2 +1,3 @@
 <resources>
+    <string name="toast_wxpay_no_weixin">没有微信客户端，请选择其他支付方式或者安装微信客户端后重试</string>
 </resources>
