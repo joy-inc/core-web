@@ -73,9 +73,11 @@ public class BaseWebViewPresenter implements IPresenter {
                 }
                 mSessionFinished.put(url, false);
                 mIsError = false;
-                mBaseView.hideContent();
                 mBaseView.hideTipView();
-                mBaseView.showLoading();
+                if (!mBaseView.isProgressEnabled()) {
+                    mBaseView.hideContent();
+                    mBaseView.showLoading();
+                }
                 if (!mNeedSeedCookie) {
                     mBaseView.onPageStarted(view, url, favicon);
                 }
@@ -89,7 +91,9 @@ public class BaseWebViewPresenter implements IPresenter {
                     mWebView.loadUrl(mInitialUrl);
                 } else {
                     mIsError = true;
-                    mBaseView.hideLoading();
+                    if (!mBaseView.isProgressEnabled()) {
+                        mBaseView.hideLoading();
+                    }
                     mBaseView.hideContent();
                     mBaseView.showErrorTip();
                     mBaseView.onReceivedError(view, errorCode, description, failingUrl);
@@ -111,7 +115,9 @@ public class BaseWebViewPresenter implements IPresenter {
                     if (mCurIndex == -1) {
                         return;
                     }
-                    mBaseView.hideLoading();
+                    if (!mBaseView.isProgressEnabled()) {
+                        mBaseView.hideLoading();
+                    }
                     mBaseView.hideTipView();
                     mBaseView.showContent();
                     if (mCurIndex == 1 && TextUtil.isNotEmpty(mInitialUrl) && !url.equals(mInitialUrl)) {

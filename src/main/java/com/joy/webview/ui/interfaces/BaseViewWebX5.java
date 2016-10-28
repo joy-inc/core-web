@@ -22,6 +22,8 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
 public interface BaseViewWebX5 extends BaseViewNet {
 
+    boolean isProgressEnabled();
+
     void onPageStarted(WebView view, String url, Bitmap favicon);
 
     void onPageFinished(WebView view, String url);

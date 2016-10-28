@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.joy.inject.module.ActivityModule;
@@ -43,6 +44,7 @@ import javax.inject.Inject;
 import static android.os.Build.VERSION_CODES.HONEYCOMB;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 /**
  * Created by Daisw on 16/9/7.
@@ -60,9 +62,11 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     protected TextView mTvTitle;
     protected boolean mTitleMoreEnable;
     protected boolean mTitleCloseEnable;
+    protected boolean mProgressEnable;
     protected ImageButton mIbTitleMore;
     protected ImageButton mIbTitleClose;
     protected JoyShare mJoyShare;
+    protected ProgressBar mProgressBar;
     protected NavigationBar mNavBar;
     protected boolean mNavDisplay = false;
     protected boolean mNavAnimate = true;
@@ -94,6 +98,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         mLongClickable = themeTa.getBoolean(R.styleable.Theme_longClickable, true);
         mTitleMoreEnable = themeTa.getBoolean(R.styleable.Theme_titleMoreEnable, true);
         mTitleCloseEnable = themeTa.getBoolean(R.styleable.Theme_titleCloseEnable, true);
+        mProgressEnable = themeTa.getBoolean(R.styleable.Theme_progressEnable, false);
         themeTa.recycle();
 
         TypedArray navTa = obtainStyledAttributes(R.styleable.NavigationBar);
@@ -124,6 +129,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
             }
             if (mTitleCloseEnable) {
                 mIbTitleClose = addTitleRightView(R.drawable.ic_close_white_24dp, (v) -> finish());
+                mIbTitleClose.setAlpha(0.f);
             }
             if (mTitleMoreEnable && mTitleCloseEnable) {
                 mIbTitleMore.setMinimumWidth(DP_1_PX * 40);
@@ -139,6 +145,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     @Override
     protected void initContentView() {
         mPresenter.getWebView().setOnLongClickListener((v) -> !mLongClickable);
+        addProgressBarIfNecessary();
         addNavBarIfNecessary();
     }
 
@@ -149,11 +156,46 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     }
 
     protected void fadeInTitleMore() {
-        AnimatorUtils.fadeIn(mIbTitleMore);
+        AnimatorUtils.fadeIn(mIbTitleMore, 200);
+    }
+
+    protected void fadeInTitleAll() {
+        if (mTitleCloseEnable) {
+            AnimatorUtils.fadeIn(mIbTitleClose, 200);
+            if (mTitleMoreEnable) {
+                AnimatorUtils.fadeIn(mIbTitleMore, 400);
+            }
+        } else {
+            if (mTitleMoreEnable) {
+                AnimatorUtils.fadeIn(mIbTitleMore, 200);
+            }
+        }
     }
 
     protected void onTitleMoreClick() {
         mJoyShare.show();
+    }
+
+    @Override
+    public boolean isProgressEnabled() {
+        return mProgressEnable;
+    }
+
+    @SuppressWarnings("ResourceType")
+    private void addProgressBarIfNecessary() {
+        if (mProgressEnable) {
+            mProgressBar = initProgressBar();
+            mProgressBar.setAlpha(0.f);
+            LayoutParams progressLp = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
+            if (!isNoTitle() && !isOverlay()) {
+                progressLp.topMargin = isSystemBarTrans() ? STATUS_BAR_HEIGHT + getToolbarHeight() : getToolbarHeight();
+            }
+            addContentView(mProgressBar, progressLp);
+        }
+    }
+
+    protected ProgressBar initProgressBar() {
+        return inflateLayout(R.layout.lib_view_web_progress_bar);
     }
 
     private void addNavBarIfNecessary() {
@@ -202,6 +244,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         if (LogMgr.DEBUG) {
             LogMgr.d("core-web", classSimpleName + " onPageStarted # currentPageIndex: " + mPresenter.getCurrentIndex() + " url: " + url);
         }
+        AnimatorUtils.fadeIn(mProgressBar);
     }
 
     @Override
@@ -209,7 +252,6 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         if (LogMgr.DEBUG) {
             LogMgr.d("core-web", classSimpleName + " onPageFinished # url: " + url);
         }
-        fadeInTitleMore();
         if (mNavDisplay && mNavAnimate) {
             mNavBar.runEnterAnimator();
         }
@@ -224,13 +266,22 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     public void onReceivedTitle(WebView view, String title) {
-        if (!isNoTitle() && TextUtil.isEmpty(mTitle)) {
-            setTitle(title);
+        if (!isNoTitle()) {
+            if (TextUtil.isEmpty(mTitle)) {
+                setTitle(title);
+            }
+            fadeInTitleAll();
         }
     }
 
     @Override
     public void onProgress(WebView view, int progress) {
+        if (mProgressEnable && mProgressBar != null) {
+            mProgressBar.setProgress(progress);
+            if (progress == 100) {
+                AnimatorUtils.fadeOut(mProgressBar);
+            }
+        }
     }
 
     @Override

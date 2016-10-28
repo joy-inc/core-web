@@ -4,6 +4,8 @@
         <attr name="longClickable" format="boolean" />
         <attr name="titleMoreEnable" format="boolean" />
         <attr name="titleCloseEnable" format="boolean" />
+        <attr name="progressEnable" format="boolean" />
+        <attr name="progressHeight" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="NavigationBar">
