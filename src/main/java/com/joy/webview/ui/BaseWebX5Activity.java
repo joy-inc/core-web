@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -129,16 +130,19 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
                 mIbTitleMore.setAlpha(0.f);
             }
             if (mTitleCloseEnable) {
-                mIbTitleClose = addTitleRightView(R.drawable.ic_close_white_24dp, (v) -> finish());
+                mIbTitleClose = addTitleRightView(R.drawable.ic_close_white_24dp, getTitleCloseClickListener());
                 mIbTitleClose.setAlpha(0.f);
             }
             if (mTitleMoreEnable && mTitleCloseEnable) {
-                mIbTitleMore.setMinimumWidth(DP_1_PX * 40);
-                mIbTitleClose.setMinimumWidth(DP_1_PX * 40);
+                mIbTitleMore.setMinimumWidth(DP_40);
+                mIbTitleClose.setMinimumWidth(DP_40);
             }
             mTvTitle = addTitleMiddleView(mTitle);
             if (TextUtil.isEmpty(mTitle)) {
                 mTvTitle.setAlpha(0.f);
+            }
+            if (getToolbar().getChildCount() == 2) {
+                ((Toolbar.LayoutParams) mTvTitle.getLayoutParams()).rightMargin = HORIZONTAL_MARGINS;
             }
         }
     }
@@ -181,6 +185,17 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         return (v) -> {
             if (v.getAlpha() == 1.f)
                 onTitleMoreClick();
+        };
+    }
+
+    protected void onTitleCloseClick() {
+        finish();
+    }
+
+    protected OnClickListener getTitleCloseClickListener() {
+        return (v) -> {
+            if (v.getAlpha() == 1.f)
+                onTitleCloseClick();
         };
     }
 
