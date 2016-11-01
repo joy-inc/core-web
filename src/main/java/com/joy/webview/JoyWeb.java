@@ -1,11 +1,11 @@
 package com.joy.webview;
 
 import android.support.annotation.Nullable;
-import android.webkit.CookieManager;
 
 import com.joy.ui.BaseApplication;
 import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
+import com.tencent.smtt.sdk.CookieManager;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
@@ -21,9 +21,15 @@ public class JoyWeb {
     private static String mCookie;
     private static boolean mCookieSeeded;
 
-    private static boolean mAppCacheEnabled = true;
-    private static String mAppCachePath = BaseApplication.getContext().getExternalCacheDir().toString();
-    private static long mAppCacheMaxSize = 1024 * 1024 * 8;// 8M
+    private static boolean mAppCacheEnabled;
+    private static String mAppCachePath;
+    private static long mAppCacheMaxSize;
+
+    static {
+        mAppCacheEnabled = true;
+        mAppCachePath = BaseApplication.getContext().getExternalCacheDir().getPath();
+        mAppCacheMaxSize = 1024 * 1024 * 8;// 8M
+    }
 
     public static void setUserAgent(@Nullable String userAgent) {
         mUserAgent = userAgent;
@@ -65,8 +71,11 @@ public class JoyWeb {
             if (SDK_INT >= LOLLIPOP) {
                 CookieManager.getInstance().removeAllCookies(value -> {
                 });
+                android.webkit.CookieManager.getInstance().removeAllCookies(value -> {
+                });
             } else {
                 CookieManager.getInstance().removeAllCookie();
+                android.webkit.CookieManager.getInstance().removeAllCookie();
             }
         } catch (Exception e) {
             e.printStackTrace();
