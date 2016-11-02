@@ -51,6 +51,7 @@ public class BaseWebX5Presenter implements IPresenter {
     BaseViewWebX5 mBaseView;
 
     private String mInitialUrl;
+    private String mTempUrl;
     private Document mDocument;
     private boolean mIsError;
     private boolean mNeedSeedCookie;
@@ -88,11 +89,9 @@ public class BaseWebX5Presenter implements IPresenter {
 
             @Override
             public void onReceivedError(WebView view, WebResourceRequest resourceRequest, WebViewClient.a a) {
-                String failingUrl = resourceRequest.getUrl().toString();
-                mSessionFinished.put(failingUrl, true);
                 if (mNeedSeedCookie) {
                     mNeedSeedCookie = false;
-                    mWebView.loadUrl(mInitialUrl);
+                    mWebView.loadUrl(mTempUrl);
                 } else {
                     mIsError = true;
                     if (!mBaseView.isProgressEnabled()) {
@@ -113,7 +112,7 @@ public class BaseWebX5Presenter implements IPresenter {
                 if (mNeedSeedCookie) {
                     mNeedSeedCookie = false;
                     JoyWeb.setCookieSeeded(true);
-                    mWebView.loadUrl(mInitialUrl);
+                    mWebView.loadUrl(mTempUrl);
                 } else if (!mIsError) {
                     mCurIndex = mWebView.copyBackForwardList().getCurrentIndex();
                     if (mCurIndex == -1) {
@@ -124,13 +123,6 @@ public class BaseWebX5Presenter implements IPresenter {
                     }
                     mBaseView.hideTipView();
                     mBaseView.showContent();
-                    if (mCurIndex == 1 && TextUtil.isNotEmpty(mInitialUrl) && !url.equals(mInitialUrl)) {
-                        mInitialUrl = url;// 当加载过cookieUrl，并且initialUrl被重定向了，这时把重定向后的URL赋给initialUrl。
-                    }
-                    if (url.equals(mInitialUrl) && mCurIndex != 0) {
-                        mWebView.clearHistory();
-                        mCurIndex = mWebView.copyBackForwardList().getCurrentIndex();
-                    }
                     getHtmlByTagName("html", 0);
                 }
             }
@@ -285,11 +277,14 @@ public class BaseWebX5Presenter implements IPresenter {
     @Override
     public void load(String url) {
         if (TextUtil.isNotEmpty(url)) {
-            String cookie = JoyWeb.getCookie();
-            mNeedSeedCookie = TextUtil.isNotEmpty(cookie) && !JoyWeb.isCookieSeeded();
-            if (mNeedSeedCookie) {
+            if (mInitialUrl == null) {
                 mInitialUrl = url;
-                mWebView.loadUrl(cookie);
+            }
+            String cookieUrl = JoyWeb.getCookie();
+            mNeedSeedCookie = TextUtil.isNotEmpty(cookieUrl) && !JoyWeb.isCookieSeeded();
+            if (mNeedSeedCookie) {
+                mTempUrl = url;
+                mWebView.loadUrl(cookieUrl);
             } else {
                 mWebView.loadUrl(url);
             }
@@ -314,10 +309,11 @@ public class BaseWebX5Presenter implements IPresenter {
     @Override
     public void goBack() {
         mCurIndex = mWebView.copyBackForwardList().getCurrentIndex() - 1;
-        if (canGoBack()) {
-            mWebView.goBack();
-        } else {
+        boolean isFirstPage = mWebView.getUrl().equals(mInitialUrl);
+        if (isFirstPage || !canGoBack()) {
             mBaseView.finish();
+        } else {
+            mWebView.goBack();
         }
     }
 
