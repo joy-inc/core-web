@@ -290,7 +290,7 @@ public class BaseWebViewPresenter implements IPresenter {
 
     @Override
     public void reload() {
-        mWebView.reload();
+        load(mWebView.getUrl());
     }
 
     @Override

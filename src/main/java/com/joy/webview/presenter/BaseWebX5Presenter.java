@@ -293,7 +293,7 @@ public class BaseWebX5Presenter implements IPresenter {
 
     @Override
     public void reload() {
-        mWebView.reload();
+        load(mWebView.getUrl());
     }
 
     @Override
