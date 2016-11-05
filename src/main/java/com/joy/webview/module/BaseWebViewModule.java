@@ -8,8 +8,11 @@ import android.webkit.WebView;
 
 import com.joy.inject.ActivityScope;
 import com.joy.inject.module.ActivityModule;
+import com.joy.ui.activity.BaseUiActivity;
 import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
+import com.joy.webview.presenter.BaseWebViewPresenter;
+import com.joy.webview.presenter.IPresenter;
 import com.joy.webview.ui.interfaces.BaseViewWeb;
 
 import dagger.Module;
@@ -36,9 +39,20 @@ public class BaseWebViewModule {
 
     @Provides
     @ActivityScope
+    BaseUiActivity provideBaseUiActivity(Activity activity) {
+        return (BaseUiActivity) activity;
+    }
+
+    @Provides
+    @ActivityScope
+    IPresenter provideIPresenter(BaseWebViewPresenter presenter) {
+        return presenter;
+    }
+
+    @Provides
+    @ActivityScope
     @SuppressLint("SetJavaScriptEnabled")
     WebView provideWebView(Activity activity) {
-
         WebView webView = new WebView(activity) {
             boolean isTouchTriggered = false;
 
@@ -78,7 +92,6 @@ public class BaseWebViewModule {
         settings.setAppCachePath(JoyWeb.getAppCachePath());
         settings.setAppCacheMaxSize(JoyWeb.getAppCacheMaxSize());
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-
         return webView;
     }
 }

@@ -1,6 +1,7 @@
 package com.joy.webview.presenter;
 
 import android.support.annotation.WorkerThread;
+import android.view.View;
 import android.webkit.JavascriptInterface;
 
 import org.jsoup.nodes.Document;
@@ -12,6 +13,8 @@ import org.jsoup.select.Elements;
  */
 
 public interface IPresenter {
+
+    View getWebView();
 
     void setUserAgent(String userAgent);
 
@@ -28,6 +31,8 @@ public interface IPresenter {
     void goBack();
 
     void goForward();
+
+    int getCurrentIndex();
 
     Document getDocument();
 

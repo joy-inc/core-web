@@ -12,11 +12,10 @@ import android.webkit.JavascriptInterface;
 import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
-import com.joy.webview.ui.interfaces.BaseViewWebX5;
+import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.joy.webview.utils.DocumentParser;
 import com.joy.webview.utils.PayIntercepter;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient.CustomViewCallback;
-import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;
@@ -48,7 +47,7 @@ public class BaseWebX5Presenter implements IPresenter {
     WebView mWebView;
 
     @Inject
-    BaseViewWebX5 mBaseView;
+    BaseViewWeb mBaseView;
 
     private String mInitialUrl;
     private String mTempUrl;
@@ -83,12 +82,12 @@ public class BaseWebX5Presenter implements IPresenter {
                     mBaseView.showLoading();
                 }
                 if (!mNeedSeedCookie) {
-                    mBaseView.onPageStarted(view, url, favicon);
+                    mBaseView.onPageStarted(url, favicon);
                 }
             }
 
             @Override
-            public void onReceivedError(WebView view, WebResourceRequest resourceRequest, WebViewClient.a a) {
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                 if (mNeedSeedCookie) {
                     mNeedSeedCookie = false;
                     mWebView.loadUrl(mTempUrl);
@@ -99,7 +98,7 @@ public class BaseWebX5Presenter implements IPresenter {
                     }
                     mBaseView.hideContent();
                     mBaseView.showErrorTip();
-                    mBaseView.onReceivedError(view, resourceRequest);
+                    mBaseView.onReceivedError(errorCode, description, failingUrl);
                 }
             }
 
@@ -138,7 +137,7 @@ public class BaseWebX5Presenter implements IPresenter {
                     LogMgr.d("core-web", "BaseWebX5Presenter shouldOverrideUrlLoading # auto redirect");
                     return super.shouldOverrideUrlLoading(view, url);
                 }
-                boolean consumed = mBaseView.onOverrideUrl(view, url);
+                boolean consumed = mBaseView.onOverrideUrl(url);
                 if (!consumed) {
                     mCurIndex++;
                 }
@@ -149,7 +148,7 @@ public class BaseWebX5Presenter implements IPresenter {
 
             @Override
             public void onShowCustomView(View view, CustomViewCallback callback) {
-                mBaseView.onShowCustomView(view, callback);
+                mBaseView.onShowCustomView(view);
             }
 
             @Override
@@ -160,35 +159,35 @@ public class BaseWebX5Presenter implements IPresenter {
             @Override
             public void onReceivedTitle(WebView view, String title) {
                 if (!mIsError && !mNeedSeedCookie) {
-                    mBaseView.onReceivedTitle(view, title);
+                    mBaseView.onReceivedTitle(title);
                 }
             }
 
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 if (!mNeedSeedCookie) {
-                    mBaseView.onProgress(view, newProgress);
+                    mBaseView.onProgress(newProgress);
                 }
             }
 
             // file upload callback (Android 3.0 (API level 11) -- Android 4.0 (API level 15)) (hidden method)
             @TargetApi(HONEYCOMB)
             public void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
-                mBaseView.onShowFileChooser(filePathCallback, acceptType, null);
+                mBaseView.onShowFileChooser(filePathCallback, acceptType);
             }
 
             // file upload callback (Android 4.1 (API level 16) -- Android 4.3 (API level 18)) (hidden method)
             @Override
             @TargetApi(JELLY_BEAN)
             public void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, String capture) {
-                mBaseView.onShowFileChooser(filePathCallback, acceptType, capture);
+                mBaseView.onShowFileChooser(filePathCallback, acceptType);
             }
 
             // for >= Lollipop, all in one
             @Override
             @TargetApi(LOLLIPOP)
             public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
-                return mBaseView.onShowFileChooser(webView, filePathCallback, fileChooserParams);
+                return mBaseView.onShowFileChooser(filePathCallback);
             }
         });
         mWebView.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength)
@@ -205,7 +204,7 @@ public class BaseWebX5Presenter implements IPresenter {
 
     private void onReceivedHtml(String html) {
         mDocument = Jsoup.parse(html);
-        mBaseView.onPageFinished(mWebView, mWebView.getUrl());
+        mBaseView.onPageFinished(mWebView.getUrl());
     }
 
     @SuppressLint("DefaultLocale")
@@ -255,6 +254,7 @@ public class BaseWebX5Presenter implements IPresenter {
         return DocumentParser.getAttribute(mDocument, attrName, attrValue, attributeKey);
     }
 
+    @Override
     public WebView getWebView() {
         return mWebView;
     }
@@ -270,6 +270,7 @@ public class BaseWebX5Presenter implements IPresenter {
      *
      * @return The current index from 0...n or -1 if the list is empty.
      */
+    @Override
     public int getCurrentIndex() {
         return mCurIndex;
     }

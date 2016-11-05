@@ -6,10 +6,12 @@ import android.view.MotionEvent;
 
 import com.joy.inject.ActivityScope;
 import com.joy.inject.module.ActivityModule;
+import com.joy.ui.activity.BaseUiActivity;
 import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
-import com.joy.webview.ui.interfaces.BaseViewWebX5;
-import com.tencent.smtt.sdk.QbSdk;
+import com.joy.webview.presenter.BaseWebX5Presenter;
+import com.joy.webview.presenter.IPresenter;
+import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
 
@@ -23,32 +25,41 @@ import dagger.Provides;
 @Module(includes = ActivityModule.class)
 public class BaseWebX5Module {
 
-    private final BaseViewWebX5 mBaseViewWebX5;
+    private final BaseViewWeb mBaseViewWeb;
 
-    public BaseWebX5Module(BaseViewWebX5 baseViewWebX5) {
-        mBaseViewWebX5 = baseViewWebX5;
+    public BaseWebX5Module(BaseViewWeb baseViewWeb) {
+        mBaseViewWeb = baseViewWeb;
     }
 
     @Provides
     @ActivityScope
-    BaseViewWebX5 provideBaseViewWebX5() {
-        return mBaseViewWebX5;
+    BaseViewWeb provideBaseViewWeb() {
+        return mBaseViewWeb;
+    }
+
+    @Provides
+    @ActivityScope
+    BaseUiActivity provideBaseUiActivity(Activity activity) {
+        return (BaseUiActivity) activity;
+    }
+
+    @Provides
+    @ActivityScope
+    IPresenter provideIPresenter(BaseWebX5Presenter presenter) {
+        return presenter;
     }
 
     @Provides
     @ActivityScope
     @SuppressLint("SetJavaScriptEnabled")
     WebView provideWebView(Activity activity) {
-
-        QbSdk.allowThirdPartyAppDownload(true);
-
         WebView webView = new WebView(activity) {
             boolean isTouchTriggered = false;
 
             @Override
             protected void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
                 if (isTouchTriggered) {
-                    mBaseViewWebX5.onScrollChanged(scrollX, scrollY, oldScrollX, oldScrollY);
+                    mBaseViewWeb.onScrollChanged(scrollX, scrollY, oldScrollX, oldScrollY);
                 }
             }
 
@@ -81,7 +92,6 @@ public class BaseWebX5Module {
         settings.setAppCachePath(JoyWeb.getAppCachePath());
         settings.setAppCacheMaxSize(JoyWeb.getAppCacheMaxSize());
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-
         return webView;
     }
 }

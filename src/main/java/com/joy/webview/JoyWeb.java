@@ -1,11 +1,13 @@
 package com.joy.webview;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 
 import com.joy.ui.BaseApplication;
 import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
 import com.tencent.smtt.sdk.CookieManager;
+import com.tencent.smtt.sdk.QbSdk;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
@@ -29,6 +31,17 @@ public class JoyWeb {
         mAppCacheEnabled = true;
         mAppCachePath = BaseApplication.getContext().getExternalCacheDir().getPath();
         mAppCacheMaxSize = 1024 * 1024 * 8;// 8M
+    }
+
+    /**
+     * 预加载腾讯X5内核，在Application的onCreate方法中调用。
+     * 如果用到腾讯X5服务，必须调用此方法。
+     *
+     * @param appContext
+     * @param callback
+     */
+    public static void initX5Environment(Context appContext, @Nullable QbSdk.PreInitCallback callback) {
+        QbSdk.initX5Environment(appContext, callback);
     }
 
     public static void setUserAgent(@Nullable String userAgent) {
