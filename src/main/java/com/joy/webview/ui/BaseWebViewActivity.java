@@ -43,7 +43,7 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     private BaseWebViewComponent component() {
         return DaggerBaseWebViewComponent.builder()
                 .activityModule(new ActivityModule(this))
-                .baseWebViewModule(new BaseWebViewModule(this))
+                .baseWebViewModule(new BaseWebViewModule(this, getIntent().getBooleanExtra(KEY_CACHE_ENABLE, false)))
                 .build();
     }
 
@@ -205,14 +205,31 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
         getUIDelegate().onBackPressed();
     }
 
-    public static void startActivity(@NonNull Context context, @NonNull String url) {
-        startActivity(context, url, null);
+    public static void startSelf(@NonNull Context context, @NonNull String url) {
+        startSelf(context, url, false);
     }
 
-    public static void startActivity(@NonNull Context context, @NonNull String url, @Nullable CharSequence title) {
-        Intent intent = new Intent(context, BaseWebViewActivity.class);
+    public static void startSelf(@NonNull Context context, @NonNull String url, boolean cacheEnable) {
+        startSelf(context, url, null, cacheEnable);
+    }
+
+    public static void startSelf(@NonNull Context context, @NonNull String url, @Nullable CharSequence title, boolean cacheEnable) {
+        startTarget(BaseWebViewActivity.class, context, url, title, cacheEnable);
+    }
+
+    public static void startTarget(Class<? extends BaseWebViewActivity> target, @NonNull Context context, @NonNull String url) {
+        startTarget(target, context, url, false);
+    }
+
+    public static void startTarget(Class<? extends BaseWebViewActivity> target, @NonNull Context context, @NonNull String url, boolean cacheEnable) {
+        startTarget(target, context, url, null, cacheEnable);
+    }
+
+    public static void startTarget(Class<? extends BaseWebViewActivity> target, @NonNull Context context, @NonNull String url, @Nullable CharSequence title, boolean cacheEnable) {
+        Intent intent = new Intent(context, target);
         intent.putExtra(KEY_URL, url);
         intent.putExtra(KEY_TITLE, title);
+        intent.putExtra(KEY_CACHE_ENABLE, cacheEnable);
         context.startActivity(intent);
     }
 }

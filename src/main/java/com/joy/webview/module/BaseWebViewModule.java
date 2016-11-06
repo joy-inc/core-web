@@ -9,6 +9,7 @@ import android.webkit.WebView;
 import com.joy.inject.ActivityScope;
 import com.joy.inject.module.ActivityModule;
 import com.joy.ui.activity.BaseUiActivity;
+import com.joy.utils.DeviceUtil;
 import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
 import com.joy.webview.presenter.BaseWebViewPresenter;
@@ -26,9 +27,11 @@ import dagger.Provides;
 public class BaseWebViewModule {
 
     private final BaseViewWeb mBaseViewWeb;
+    private final boolean mCacheEnable;
 
-    public BaseWebViewModule(BaseViewWeb baseViewWeb) {
+    public BaseWebViewModule(BaseViewWeb baseViewWeb, boolean cacheEnable) {
         mBaseViewWeb = baseViewWeb;
+        mCacheEnable = cacheEnable;
     }
 
     @Provides
@@ -91,7 +94,12 @@ public class BaseWebViewModule {
         settings.setAppCacheEnabled(JoyWeb.isAppCacheEnabled());
         settings.setAppCachePath(JoyWeb.getAppCachePath());
         settings.setAppCacheMaxSize(JoyWeb.getAppCacheMaxSize());
-        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        if (mCacheEnable) {
+            boolean networkEnable = DeviceUtil.isNetworkEnable(activity.getApplicationContext());
+            settings.setCacheMode(networkEnable ? WebSettings.LOAD_NO_CACHE : WebSettings.LOAD_CACHE_ONLY);
+        } else {
+            settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        }
         return webView;
     }
 }

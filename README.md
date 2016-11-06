@@ -8,7 +8,7 @@ Android Webkit + Tencent X5 Webkit + MVP + Dagger2
 Gradle:
 
 ```
-compile 'com.joy.support:core-web:0.2.0'
+compile 'com.joy.support:core-web:0.2.1'
 ```
 
 Maven:
@@ -17,7 +17,7 @@ Maven:
 <dependency>
   <groupId>com.joy.support</groupId>
   <artifactId>core-web</artifactId>
-  <version>0.2.0</version>
+  <version>0.2.1</version>
   <type>pom</type>
 </dependency>
 ```
@@ -25,27 +25,20 @@ Maven:
 Ivy:
 
 ```
-<dependency org='com.joy.support' name='core-web' rev='0.2.0'>
+<dependency org='com.joy.support' name='core-web' rev='0.2.1'>
   <artifact name='$AID' ext='pom'></artifact>
 </dependency>
 ```
 
-## Initialize (optional)
+## Initialize（必须继承BaseApplication）
 
 ```
-public class JoyApplication extends Application {
+public class YourApplication extends BaseApplication {
 
     @Override
     public void onCreate() {
         super.onCreate();
-        JoyWeb.setUserAgent(user_agent);
-        if (isLogin()) {
-            JoyWeb.setCookie(cookie_url);
-        }
-    }
-
-    public static void releaseJoyWeb() {
-        JoyWeb.release();
+        JoyWeb.initX5Environment(this, callback);// 预加载腾讯X5内核，如果用到腾讯X5服务必须调用此方法，callback可以为null。
     }
 }
 ```
@@ -55,15 +48,23 @@ public class JoyApplication extends Application {
 **BaseWebViewActivity**
 
 ```
-BaseWebViewActivity.startActivity(@NonNull Context context, @NonNull String url);
-BaseWebViewActivity.startActivity(@NonNull Context context, @NonNull String url, @Nullable String title);
+public static void startSelf(@NonNull Context context, @NonNull String url);
+public static void startSelf(@NonNull Context context, @NonNull String url, boolean cacheEnable);
+public static void startSelf(@NonNull Context context, @NonNull String url, @Nullable CharSequence title, boolean cacheEnable);
+public static void startTarget(Class<? extends BaseWebViewActivity> target, @NonNull Context context, @NonNull String url);
+public static void startTarget(Class<? extends BaseWebViewActivity> target, @NonNull Context context, @NonNull String url, boolean cacheEnable);
+public static void startTarget(Class<? extends BaseWebViewActivity> target, @NonNull Context context, @NonNull String url, @Nullable CharSequence title, boolean cacheEnable);
 ```
 
 **BaseWebX5Activity**
 
 ```
-BaseWebX5Activity.startActivity(@NonNull Context context, @NonNull String url);
-BaseWebX5Activity.startActivity(@NonNull Context context, @NonNull String url, @Nullable String title);
+public static void startSelf(@NonNull Context context, @NonNull String url);
+public static void startSelf(@NonNull Context context, @NonNull String url, boolean cacheEnable);
+public static void startSelf(@NonNull Context context, @NonNull String url, @Nullable CharSequence title, boolean cacheEnable);
+public static void startTarget(Class<? extends BaseWebViewActivity> target, @NonNull Context context, @NonNull String url);
+public static void startTarget(Class<? extends BaseWebViewActivity> target, @NonNull Context context, @NonNull String url, boolean cacheEnable);
+public static void startTarget(Class<? extends BaseWebViewActivity> target, @NonNull Context context, @NonNull String url, @Nullable CharSequence title, boolean cacheEnable);
 ```
 
 ## Theme
