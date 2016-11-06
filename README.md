@@ -62,9 +62,9 @@ public static void startTarget(Class<? extends BaseWebViewActivity> target, @Non
 public static void startSelf(@NonNull Context context, @NonNull String url);
 public static void startSelf(@NonNull Context context, @NonNull String url, boolean cacheEnable);
 public static void startSelf(@NonNull Context context, @NonNull String url, @Nullable CharSequence title, boolean cacheEnable);
-public static void startTarget(Class<? extends BaseWebViewActivity> target, @NonNull Context context, @NonNull String url);
-public static void startTarget(Class<? extends BaseWebViewActivity> target, @NonNull Context context, @NonNull String url, boolean cacheEnable);
-public static void startTarget(Class<? extends BaseWebViewActivity> target, @NonNull Context context, @NonNull String url, @Nullable CharSequence title, boolean cacheEnable);
+public static void startTarget(Class<? extends BaseWebX5Activity> target, @NonNull Context context, @NonNull String url);
+public static void startTarget(Class<? extends BaseWebX5Activity> target, @NonNull Context context, @NonNull String url, boolean cacheEnable);
+public static void startTarget(Class<? extends BaseWebX5Activity> target, @NonNull Context context, @NonNull String url, @Nullable CharSequence title, boolean cacheEnable);
 ```
 
 ## Theme
