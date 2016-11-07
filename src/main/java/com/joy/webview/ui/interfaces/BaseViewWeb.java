@@ -5,8 +5,13 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.View;
 import android.webkit.ValueCallback;
+import android.widget.ProgressBar;
 
+import com.joy.share.ShareItem;
 import com.joy.ui.activity.interfaces.BaseViewNet;
+import com.joy.webview.view.NavigationBar;
+
+import java.util.List;
 
 import static android.os.Build.VERSION_CODES.HONEYCOMB;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
@@ -45,4 +50,16 @@ public interface BaseViewWeb extends BaseViewNet {
     boolean onShowFileChooser(ValueCallback<Uri[]> filePathCallback);
 
     void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY);
+
+    void onTitleMoreClick();
+
+    void onTitleCloseClick();
+
+    ProgressBar initProgressBar();
+
+    NavigationBar initNavigationBar();
+
+    List<ShareItem> getShareItems();
+
+    void onShareItemClick(int position, View v, ShareItem item);
 }

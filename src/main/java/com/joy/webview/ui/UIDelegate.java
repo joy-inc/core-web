@@ -21,6 +21,7 @@ import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
 import com.joy.webview.R;
 import com.joy.webview.presenter.IPresenter;
+import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.joy.webview.utils.AnimatorUtils;
 import com.joy.webview.view.NavigationBar;
 
@@ -43,6 +44,9 @@ import static com.joy.webview.ui.interfaces.KConstant.KEY_URL;
  */
 
 public class UIDelegate {
+
+    @Inject
+    BaseViewWeb mBaseView;
 
     @Inject
     BaseUiActivity mActivity;
@@ -98,8 +102,8 @@ public class UIDelegate {
         mTitle = mActivity.getIntent().getCharSequenceExtra(KEY_TITLE);
 
         mJoyShare = new JoyShare(mActivity);
-        mJoyShare.setData(getShareItems());
-        mJoyShare.setOnItemClickListener(this::onShareItemClick);
+        mJoyShare.setData(mBaseView.getShareItems());
+        mJoyShare.setOnItemClickListener((position, v, item) -> mBaseView.onShareItemClick(position, v, item));
     }
 
     void initTitleView() {
@@ -152,7 +156,7 @@ public class UIDelegate {
     View.OnClickListener getTitleMoreClickListener() {
         return (v) -> {
             if (v.getAlpha() == 1.f)
-                onTitleMoreClick();
+                mBaseView.onTitleMoreClick();
         };
     }
 
@@ -167,7 +171,7 @@ public class UIDelegate {
     View.OnClickListener getTitleCloseClickListener() {
         return (v) -> {
             if (v.getAlpha() == 1.f)
-                onTitleCloseClick();
+                mBaseView.onTitleCloseClick();
         };
     }
 
@@ -200,7 +204,7 @@ public class UIDelegate {
     @SuppressWarnings("ResourceType")
     private void addProgressBarIfNecessary() {
         if (mProgressEnable) {
-            mProgressBar = initProgressBar();
+            mProgressBar = mBaseView.initProgressBar();
             mProgressBar.setAlpha(0.f);
             LayoutParams progressLp = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
             if (!mActivity.isNoTitle() && !mActivity.isOverlay()) {
@@ -217,7 +221,7 @@ public class UIDelegate {
 
     private void addNavBarIfNecessary() {
         if (mNavDisplay) {
-            mNavBar = initNavigationBar();
+            mNavBar = mBaseView.initNavigationBar();
             if (mNavAnimate) {
                 mNavBar.setAlpha(0.f);
                 mNavBar.setTranslationY(mNavHeight);

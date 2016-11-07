@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.webkit.ValueCallback;
 import android.widget.ProgressBar;
 
@@ -47,7 +46,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
                 .build();
     }
 
-    protected final UIDelegate getUIDelegate() {
+    public final UIDelegate getUIDelegate() {
         return mDelegate;
     }
 
@@ -79,33 +78,35 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         getUIDelegate().initContentView();
     }
 
+    public final String getUrl() {
+        return getUIDelegate().getUrl();
+    }
+
     @Override
     public void setTitle(CharSequence title) {
         getUIDelegate().setTitle(title);
     }
 
-    protected void setTitleMoreEnable(boolean enalbe) {
+    public String getTitleText() {
+        return (String) getUIDelegate().getTitle();
+    }
+
+    public void setTitleMoreEnable(boolean enalbe) {
         getUIDelegate().setTitleMoreEnable(enalbe);
     }
 
-    protected void onTitleMoreClick() {
+    @Override
+    public void onTitleMoreClick() {
         getUIDelegate().onTitleMoreClick();
     }
 
-    protected OnClickListener getTitleMoreClickListener() {
-        return getUIDelegate().getTitleMoreClickListener();
-    }
-
-    protected void setTitleCloseEnable(boolean enable) {
+    public void setTitleCloseEnable(boolean enable) {
         getUIDelegate().setTitleCloseEnable(enable);
     }
 
-    protected void onTitleCloseClick() {
+    @Override
+    public void onTitleCloseClick() {
         getUIDelegate().onTitleCloseClick();
-    }
-
-    protected OnClickListener getTitleCloseClickListener() {
-        return getUIDelegate().getTitleCloseClickListener();
     }
 
     @Override
@@ -113,23 +114,31 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         return getUIDelegate().isProgressEnabled();
     }
 
-    protected ProgressBar initProgressBar() {
+    @Override
+    public ProgressBar initProgressBar() {
         return getUIDelegate().initProgressBar();
     }
 
-    protected NavigationBar initNavigationBar() {
+    @Override
+    public NavigationBar initNavigationBar() {
         return getUIDelegate().initNavigationBar();
     }
 
-    protected final BaseWebX5Presenter getPresenter() {
+    public final NavigationBar getNavigationBar() {
+        return getUIDelegate().getNavigationBar();
+    }
+
+    public final BaseWebX5Presenter getPresenter() {
         return (BaseWebX5Presenter) getUIDelegate().getPresenter();
     }
 
-    protected List<ShareItem> getShareItems() {
+    @Override
+    public List<ShareItem> getShareItems() {
         return getUIDelegate().getShareItems();
     }
 
-    protected void onShareItemClick(int position, View v, ShareItem item) {
+    @Override
+    public void onShareItemClick(int position, View v, ShareItem item) {
         getUIDelegate().onShareItemClick(position, v, item);
     }
 
