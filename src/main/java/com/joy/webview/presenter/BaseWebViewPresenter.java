@@ -53,7 +53,6 @@ public class BaseWebViewPresenter implements IPresenter {
     private Document mDocument;
     private boolean mIsError;
     private boolean mNeedSeedCookie;
-    private int mCurIndex;
     private Map<String, Boolean> mSessionFinished;
 
     @Inject
@@ -112,8 +111,7 @@ public class BaseWebViewPresenter implements IPresenter {
                     JoyWeb.setCookieSeeded(true);
                     mWebView.loadUrl(mTempUrl);
                 } else if (!mIsError) {
-                    mCurIndex = mWebView.copyBackForwardList().getCurrentIndex();
-                    if (mCurIndex == -1) {
+                    if (mWebView.copyBackForwardList().getCurrentIndex() == -1) {
                         return;
                     }
                     if (!mBaseView.isProgressEnabled()) {
@@ -133,14 +131,10 @@ public class BaseWebViewPresenter implements IPresenter {
                 String prevUrl = view.getUrl();
                 boolean isAutoRedirect = mSessionFinished.get(prevUrl) != null && !mSessionFinished.get(prevUrl);
                 if (isAutoRedirect) {// 如果是自动重定向，则交给webview处理。
-                    LogMgr.d("core-web", "BaseWebViewPresenter shouldOverrideUrlLoading # auto redirect");
+                    LogMgr.d("core-web", "BaseWebViewPresenter shouldOverrideUrlLoading # auto redirect " + url);
                     return super.shouldOverrideUrlLoading(view, url);
                 }
-                boolean consumed = mBaseView.onOverrideUrl(url);
-                if (!consumed) {
-                    mCurIndex++;
-                }
-                return consumed;
+                return mBaseView.onOverrideUrl(url);
             }
         });
         mWebView.setWebChromeClient(new WebChromeClient() {
@@ -184,7 +178,7 @@ public class BaseWebViewPresenter implements IPresenter {
             // for >= Lollipop, all in one
             @Override
             @TargetApi(LOLLIPOP)
-            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+            public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
                 return mBaseView.onShowFileChooser(filePathCallback);
             }
         });
@@ -262,17 +256,6 @@ public class BaseWebViewPresenter implements IPresenter {
         return mWebView.getUrl();
     }
 
-    /**
-     * Get the index of the current history item. This index can be used to
-     * directly index into the array list.
-     *
-     * @return The current index from 0...n or -1 if the list is empty.
-     */
-    @Override
-    public int getCurrentIndex() {
-        return mCurIndex;
-    }
-
     @Override
     public void load(String url) {
         if (TextUtil.isNotEmpty(url)) {
@@ -296,6 +279,11 @@ public class BaseWebViewPresenter implements IPresenter {
     }
 
     @Override
+    public boolean isFirstPage() {
+        return !canGoBack() || mInitialUrl == null || mInitialUrl.equals(mWebView.getUrl());
+    }
+
+    @Override
     public boolean canGoBack() {
         return mWebView.canGoBack();
     }
@@ -307,9 +295,7 @@ public class BaseWebViewPresenter implements IPresenter {
 
     @Override
     public void goBack() {
-        mCurIndex = mWebView.copyBackForwardList().getCurrentIndex() - 1;
-        boolean isFirstPage = mWebView.getUrl().equals(mInitialUrl);
-        if (isFirstPage || !canGoBack()) {
+        if (isFirstPage()) {
             mBaseView.finish();
         } else {
             mWebView.goBack();
@@ -319,7 +305,6 @@ public class BaseWebViewPresenter implements IPresenter {
     @Override
     public void goForward() {
         if (canGoForward()) {
-            mCurIndex++;
             mWebView.goForward();
         }
     }

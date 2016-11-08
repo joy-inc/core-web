@@ -245,7 +245,7 @@ public class UIDelegate {
 
     void onPageStarted(String url, Bitmap favicon) {
         if (LogMgr.DEBUG) {
-            LogMgr.d("core-web", mActivity.getClass().getSimpleName() + " onPageStarted # currentPageIndex: " + mPresenter.getCurrentIndex() + " url: " + url);
+            LogMgr.d("core-web", mActivity.getClass().getSimpleName() + " onPageStarted # url: " + url);
         }
         AnimatorUtils.fadeIn(mProgressBar);
     }

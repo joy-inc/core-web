@@ -18,7 +18,7 @@ import com.joy.ui.activity.BaseHttpUiActivity;
 import com.joy.webview.component.BaseWebViewComponent;
 import com.joy.webview.component.DaggerBaseWebViewComponent;
 import com.joy.webview.module.BaseWebViewModule;
-import com.joy.webview.presenter.BaseWebViewPresenter;
+import com.joy.webview.presenter.IPresenter;
 import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.joy.webview.ui.interfaces.KConstant;
 import com.joy.webview.view.NavigationBar;
@@ -128,8 +128,8 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
         return getUIDelegate().getNavigationBar();
     }
 
-    public final BaseWebViewPresenter getPresenter() {
-        return (BaseWebViewPresenter) getUIDelegate().getPresenter();
+    public final IPresenter getPresenter() {
+        return getUIDelegate().getPresenter();
     }
 
     @Override

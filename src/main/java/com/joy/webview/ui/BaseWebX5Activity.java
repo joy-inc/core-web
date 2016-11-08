@@ -18,7 +18,7 @@ import com.joy.ui.activity.BaseHttpUiActivity;
 import com.joy.webview.component.BaseWebX5Component;
 import com.joy.webview.component.DaggerBaseWebX5Component;
 import com.joy.webview.module.BaseWebX5Module;
-import com.joy.webview.presenter.BaseWebX5Presenter;
+import com.joy.webview.presenter.IPresenter;
 import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.joy.webview.ui.interfaces.KConstant;
 import com.joy.webview.view.NavigationBar;
@@ -128,8 +128,8 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         return getUIDelegate().getNavigationBar();
     }
 
-    public final BaseWebX5Presenter getPresenter() {
-        return (BaseWebX5Presenter) getUIDelegate().getPresenter();
+    public final IPresenter getPresenter() {
+        return getUIDelegate().getPresenter();
     }
 
     @Override
