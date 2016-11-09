@@ -12,12 +12,17 @@ import android.webkit.JavascriptInterface;
 import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
+import com.joy.webview.R;
 import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.joy.webview.utils.DocumentParser;
 import com.joy.webview.utils.PayIntercepter;
+import com.joy.webview.utils.UriUtils;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient.CustomViewCallback;
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.ValueCallback;
+import com.tencent.smtt.sdk.WebBackForwardList;
 import com.tencent.smtt.sdk.WebChromeClient;
+import com.tencent.smtt.sdk.WebHistoryItem;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
@@ -49,7 +54,6 @@ public class BaseWebX5Presenter implements IPresenter {
     @Inject
     BaseViewWeb mBaseView;
 
-    private String mInitialUrl;
     private String mTempUrl;
     private Document mDocument;
     private boolean mIsError;
@@ -98,6 +102,13 @@ public class BaseWebX5Presenter implements IPresenter {
                     mBaseView.hideContent();
                     mBaseView.showErrorTip();
                     mBaseView.onReceivedError(errorCode, description, failingUrl);
+                }
+            }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebViewClient.a a) {
+                if (request.isForMainFrame()) {
+                    onReceivedError(view, -1, "", request.getUrl().toString());
                 }
             }
 
@@ -180,7 +191,7 @@ public class BaseWebX5Presenter implements IPresenter {
             // for >= Lollipop, all in one
             @Override
             @TargetApi(LOLLIPOP)
-            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+            public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
                 return mBaseView.onShowFileChooser(filePathCallback);
             }
         });
@@ -261,9 +272,6 @@ public class BaseWebX5Presenter implements IPresenter {
     @Override
     public void load(String url) {
         if (TextUtil.isNotEmpty(url)) {
-            if (mInitialUrl == null) {
-                mInitialUrl = url;
-            }
             String cookieUrl = JoyWeb.getCookie();
             mNeedSeedCookie = TextUtil.isNotEmpty(cookieUrl) && !JoyWeb.isCookieSeeded();
             if (mNeedSeedCookie) {
@@ -281,11 +289,6 @@ public class BaseWebX5Presenter implements IPresenter {
     }
 
     @Override
-    public boolean isFirstPage() {
-        return !canGoBack() || mInitialUrl == null || mInitialUrl.equals(mWebView.getUrl());
-    }
-
-    @Override
     public boolean canGoBack() {
         return mWebView.canGoBack();
     }
@@ -297,17 +300,85 @@ public class BaseWebX5Presenter implements IPresenter {
 
     @Override
     public void goBack() {
-        if (isFirstPage()) {
-            mBaseView.finish();
-        } else {
-            mWebView.goBack();
+        WebBackForwardList list = mWebView.copyBackForwardList();
+        int curIndex = list.getCurrentIndex();
+        WebHistoryItem curItem = list.getCurrentItem();
+        WebHistoryItem prevItem = list.getItemAtIndex(curIndex - 1);
+        int steps = 0;
+        if (prevItem != null) {
+            steps--;
+            if (prevItem.getUrl().equals(JoyWeb.getCookie())) {
+                prevItem = list.getItemAtIndex(curIndex - 2);
+                if (prevItem != null) {
+                    steps--;
+                    if (UriUtils.isEquals(prevItem.getUrl(), curItem.getUrl())) {
+                        prevItem = list.getItemAtIndex(curIndex - 3);
+                        if (prevItem != null) {
+                            steps--;
+                            goBackOrForward(steps);
+                        } else {
+                            mBaseView.finish();
+                        }
+                        return;
+                    }
+                    if (goBackOrForward(steps)) {
+                        return;
+                    }
+                }
+            }
+            if (goBackOrForward(steps)) {
+                return;
+            }
         }
+        mBaseView.finish();
     }
 
     @Override
     public void goForward() {
-        if (canGoForward()) {
-            mWebView.goForward();
+        WebBackForwardList list = mWebView.copyBackForwardList();
+        int curIndex = list.getCurrentIndex();
+        WebHistoryItem curItem = list.getCurrentItem();
+        WebHistoryItem nextItem = list.getItemAtIndex(curIndex + 1);
+        int steps = 0;
+        if (nextItem != null) {
+            steps++;
+            if (nextItem.getUrl().equals(JoyWeb.getCookie())) {
+                nextItem = list.getItemAtIndex(curIndex + 2);
+                if (nextItem != null) {
+                    steps++;
+                    if (UriUtils.isEquals(nextItem.getUrl(), curItem.getUrl())) {
+                        nextItem = list.getItemAtIndex(curIndex + 3);
+                        if (nextItem != null) {
+                            steps++;
+                            goBackOrForward(steps);
+                        } else {
+                            mBaseView.showToast(R.string.toast_no_next_page);
+                        }
+                        return;
+                    }
+                    if (goBackOrForward(steps)) {
+                        return;
+                    }
+                }
+            }
+            if (goBackOrForward(steps)) {
+                return;
+            }
         }
+        mBaseView.showToast(R.string.toast_no_next_page);
+    }
+
+    @Override
+    public boolean canGoBackOrForward(int steps) {
+        return mWebView.canGoBackOrForward(steps);
+    }
+
+    @Override
+    public boolean goBackOrForward(int steps) {
+        if (canGoBackOrForward(steps)) {
+            mWebView.goBackOrForward(steps);
+            return true;
+        }
+        return false;
     }
 }

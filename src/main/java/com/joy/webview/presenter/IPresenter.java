@@ -32,9 +32,9 @@ public interface IPresenter {
 
     void goForward();
 
-//    int getCurrentIndex();
+    boolean canGoBackOrForward(int steps);
 
-    boolean isFirstPage();
+    boolean goBackOrForward(int steps);
 
     Document getDocument();
 
