@@ -88,7 +88,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     }
 
     public String getTitleText() {
-        return (String) getUIDelegate().getTitle();
+        return getUIDelegate().getTitle();
     }
 
     public void setTitleMoreEnable(boolean enalbe) {

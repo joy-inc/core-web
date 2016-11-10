@@ -16,9 +16,21 @@ public interface IPresenter {
 
     View getWebView();
 
-    void setUserAgent(String userAgent);
+    String getUrl();
 
-    String url();
+    String getTitle();
+
+    void onPause();
+
+    void onResume();
+
+    void onDestroy();
+
+    void stopLoading();
+
+    void switchErrorView(int errorCode, String description, String failingUrl);
+
+    void setUserAgent(String userAgent);
 
     void load(String url);
 
@@ -35,6 +47,8 @@ public interface IPresenter {
     boolean canGoBackOrForward(int steps);
 
     boolean goBackOrForward(int steps);
+
+    boolean isHostFinishing();
 
     Document getDocument();
 

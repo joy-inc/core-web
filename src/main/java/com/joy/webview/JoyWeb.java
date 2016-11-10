@@ -27,10 +27,13 @@ public class JoyWeb {
     private static String mAppCachePath;
     private static long mAppCacheMaxSize;
 
+    private static long mTimeoutDuration;
+
     static {
         mAppCacheEnabled = true;
         mAppCachePath = BaseApplication.getContext().getExternalCacheDir().getPath();
         mAppCacheMaxSize = 1024 * 1024 * 8;// 8M
+        mTimeoutDuration = 15 * 1000;// 10s
     }
 
     /**
@@ -121,5 +124,13 @@ public class JoyWeb {
 
     public static void setLogcatDisable(boolean disable) {
         LogMgr.DEBUG = disable;
+    }
+
+    public static void setTimeoutDuration(long duration) {
+        mTimeoutDuration = duration;
+    }
+
+    public static long getTimeoutDuration() {
+        return mTimeoutDuration;
     }
 }

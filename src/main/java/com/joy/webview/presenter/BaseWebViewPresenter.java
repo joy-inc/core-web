@@ -16,6 +16,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.joy.ui.utils.DimenCons;
 import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
@@ -23,6 +24,7 @@ import com.joy.webview.R;
 import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.joy.webview.utils.DocumentParser;
 import com.joy.webview.utils.PayIntercepter;
+import com.joy.webview.utils.TimeoutHandler;
 import com.joy.webview.utils.UriUtils;
 
 import org.jsoup.Jsoup;
@@ -38,6 +40,7 @@ import javax.inject.Inject;
 import static android.os.Build.VERSION_CODES.HONEYCOMB;
 import static android.os.Build.VERSION_CODES.JELLY_BEAN;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
+import static com.joy.webview.utils.TimeoutHandler.WHAT_TIMEOUT_ERROR;
 
 /**
  * Created by Daisw on 16/8/14.
@@ -56,26 +59,30 @@ public class BaseWebViewPresenter implements IPresenter {
     private Document mDocument;
     private boolean mIsError;
     private boolean mNeedSeedCookie;
-    private Map<String, Boolean> mSessionFinished;
+    private Map<String, Boolean> mPageFinished;
+    private TimeoutHandler mTimerHandler;
 
     @Inject
     BaseWebViewPresenter() {
-        mSessionFinished = new HashMap<>();
+        mPageFinished = new HashMap<>();
+        mTimerHandler = new TimeoutHandler(this);
     }
 
     @Inject
     void setWebViewClient() {
-
         mWebView.setWebViewClient(new WebViewClient() {
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                addTimeoutMessage();
                 String prevUrl = view.getUrl();
-                boolean isRedirected = mSessionFinished.get(prevUrl) != null && !mSessionFinished.get(prevUrl);
+//                LogMgr.e("core-web", "prevUrl: " + prevUrl);
+                boolean isRedirected = !isPageFinished(prevUrl);
                 if (isRedirected) {// 如果initialUrl被重定向了，则跳出方法体。
+//                    LogMgr.d("core-web", "BaseWebViewPresenter onPageStarted # is redirected");
                     return;
                 }
-                mSessionFinished.put(url, false);
+                mPageFinished.put(url, false);
                 mIsError = false;
                 mBaseView.hideTipView();
                 if (!mBaseView.isProgressEnabled()) {
@@ -89,23 +96,25 @@ public class BaseWebViewPresenter implements IPresenter {
 
             @Override
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                if (isHostFinishing()) {
+                    return;
+                }
+                removeTimeoutMessage();
                 if (mNeedSeedCookie) {
                     mNeedSeedCookie = false;
                     mWebView.loadUrl(mTempUrl);
                 } else {
-                    mIsError = true;
-                    if (!mBaseView.isProgressEnabled()) {
-                        mBaseView.hideLoading();
-                    }
-                    mBaseView.hideContent();
-                    mBaseView.showErrorTip();
-                    mBaseView.onReceivedError(errorCode, description, failingUrl);
+                    switchErrorView(errorCode, description, failingUrl);
                 }
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                mSessionFinished.put(url, true);
+                if (isHostFinishing()) {
+                    return;
+                }
+                removeTimeoutMessage();
+                mPageFinished.put(url, true);
                 if (!url.equals(view.getUrl())) {// 如果当前URL和webview所持有的URL不一致时，抛掉当前URL的回调，跳出方法体。
                     return;
                 }
@@ -132,7 +141,7 @@ public class BaseWebViewPresenter implements IPresenter {
                     return true;
                 }
                 String prevUrl = view.getUrl();
-                boolean isAutoRedirect = mSessionFinished.get(prevUrl) != null && !mSessionFinished.get(prevUrl);
+                boolean isAutoRedirect = !isPageFinished(prevUrl);
                 if (isAutoRedirect) {// 如果是自动重定向，则交给webview处理。
                     LogMgr.d("core-web", "BaseWebViewPresenter shouldOverrideUrlLoading # auto redirect " + url);
                     return super.shouldOverrideUrlLoading(view, url);
@@ -154,6 +163,9 @@ public class BaseWebViewPresenter implements IPresenter {
 
             @Override
             public void onReceivedTitle(WebView view, String title) {
+                if (isHostFinishing()) {
+                    return;
+                }
                 if (!mIsError && !mNeedSeedCookie) {
                     mBaseView.onReceivedTitle(title);
                 }
@@ -197,9 +209,47 @@ public class BaseWebViewPresenter implements IPresenter {
         }, "htmlSource");
     }
 
+    @Inject
+    void associatedHostLifecycle() {
+        mBaseView.lifecycle()
+                .subscribe(event -> {
+                    switch (event) {
+                        case PAUSE:
+                            if (isHostFinishing()) {
+                                removeTimeoutMessage();
+                                stopLoading();
+                            }
+                            onPause();
+                            break;
+                        case RESUME:
+                            onResume();
+                            break;
+                        case DESTROY:
+                            onDestroy();
+                            break;
+                        default:
+                            break;
+                    }
+                });
+    }
+
+    private boolean isPageFinished(String url) {
+        Boolean b = mPageFinished.get(url);
+        return b == null || b;
+    }
+
+    private void addTimeoutMessage() {
+        removeTimeoutMessage();
+        mTimerHandler.sendEmptyMessageDelayed(WHAT_TIMEOUT_ERROR, JoyWeb.getTimeoutDuration());
+    }
+
+    private void removeTimeoutMessage() {
+        mTimerHandler.removeMessages(WHAT_TIMEOUT_ERROR);
+    }
+
     private void onReceivedHtml(String html) {
         mDocument = Jsoup.parse(html);
-        mBaseView.onPageFinished(mWebView.getUrl());
+        mBaseView.onPageFinished(getUrl());
     }
 
     @SuppressLint("DefaultLocale")
@@ -250,13 +300,61 @@ public class BaseWebViewPresenter implements IPresenter {
     }
 
     @Override
+    public boolean isHostFinishing() {
+        return mBaseView.isFinishing();
+    }
+
+    @Override
     public WebView getWebView() {
         return mWebView;
     }
 
     @Override
-    public String url() {
+    public String getUrl() {
         return mWebView.getUrl();
+    }
+
+    @Override
+    public String getTitle() {
+        return mWebView.getTitle();
+    }
+
+    @Override
+    public void onPause() {
+        mWebView.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        mWebView.onResume();
+    }
+
+    @Override
+    public void onDestroy() {
+        mWebView.destroy();
+    }
+
+    @Override
+    public void stopLoading() {
+        mWebView.stopLoading();
+    }
+
+    @Override
+    public void switchErrorView(int errorCode, String description, String failingUrl) {
+        if (mBaseView.isProgressEnabled()) {
+            int height = mWebView.getContentHeight();
+//            LogMgr.e("core-web", "height: " + height);
+            if (height > DimenCons.SCREEN_HEIGHT_ABSOLUTE) {// FIXME: 2016/11/10 当contentHeight>screenHeight时跳出方法提，但是这样的判断可能会存在问题，如contentHeight本身就没screenHeight大又或者其他不确定因素
+                return;
+            }
+        }
+        mIsError = true;
+        if (!mBaseView.isProgressEnabled()) {
+            mBaseView.hideLoading();
+        }
+        mBaseView.hideContent();
+        mBaseView.showErrorTip();
+        mBaseView.onReceivedError(errorCode, description, failingUrl);
     }
 
     @Override
@@ -275,7 +373,7 @@ public class BaseWebViewPresenter implements IPresenter {
 
     @Override
     public void reload() {
-        load(mWebView.getUrl());
+        load(getUrl());
     }
 
     @Override

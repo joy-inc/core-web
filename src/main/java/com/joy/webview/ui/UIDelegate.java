@@ -56,7 +56,6 @@ public class UIDelegate {
 
     String mUrl;
     CharSequence mTitle;
-    boolean mHasTitleIntent;
     TextView mTvTitle;
     boolean mTitleMoreEnable;
     boolean mTitleCloseEnable;
@@ -101,7 +100,6 @@ public class UIDelegate {
     void initData() {
         mUrl = mActivity.getIntent().getStringExtra(KEY_URL);
         mTitle = mActivity.getIntent().getCharSequenceExtra(KEY_TITLE);
-        mHasTitleIntent = TextUtil.isNotEmpty(mTitle);
 
         mJoyShare = new JoyShare(mActivity);
         mJoyShare.setData(mBaseView.getShareItems());
@@ -267,9 +265,8 @@ public class UIDelegate {
     }
 
     void onReceivedTitle(String title) {
-        mTitle = title;
         if (!mActivity.isNoTitle()) {
-            if (!mHasTitleIntent) {
+            if (TextUtil.isEmpty(mTitle)) {
                 setTitle(title);
             }
             fadeInTitleAll();
@@ -336,11 +333,11 @@ public class UIDelegate {
     }
 
     public String getUrl() {
-        return mPresenter.url();
+        return mPresenter.getUrl();
     }
 
-    public CharSequence getTitle() {
-        return mTitle;
+    public String getTitle() {
+        return mPresenter.getTitle();
     }
 
     public NavigationBar getNavigationBar() {
