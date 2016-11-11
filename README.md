@@ -8,7 +8,7 @@ Android Webkit + Tencent X5 Webkit + MVP + Dagger2
 Gradle:
 
 ```
-compile 'com.joy.support:core-web:0.2.1'
+compile 'com.joy.support:core-web:0.2.2'
 ```
 
 Maven:
@@ -17,7 +17,7 @@ Maven:
 <dependency>
   <groupId>com.joy.support</groupId>
   <artifactId>core-web</artifactId>
-  <version>0.2.1</version>
+  <version>0.2.2</version>
   <type>pom</type>
 </dependency>
 ```
@@ -25,7 +25,7 @@ Maven:
 Ivy:
 
 ```
-<dependency org='com.joy.support' name='core-web' rev='0.2.1'>
+<dependency org='com.joy.support' name='core-web' rev='0.2.2'>
   <artifact name='$AID' ext='pom'></artifact>
 </dependency>
 ```
