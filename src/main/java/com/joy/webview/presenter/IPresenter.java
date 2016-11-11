@@ -14,11 +14,17 @@ import org.jsoup.select.Elements;
 
 public interface IPresenter {
 
+    boolean isHostFinishing();
+
+    boolean isProgressEnabled();
+
     View getWebView();
 
     String getUrl();
 
     String getTitle();
+
+    int getContentHeight();
 
     void onPause();
 
@@ -47,8 +53,6 @@ public interface IPresenter {
     boolean canGoBackOrForward(int steps);
 
     boolean goBackOrForward(int steps);
-
-    boolean isHostFinishing();
 
     Document getDocument();
 

@@ -16,7 +16,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.joy.ui.utils.DimenCons;
 import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
@@ -76,10 +75,9 @@ public class BaseWebViewPresenter implements IPresenter {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 addTimeoutMessage();
                 String prevUrl = view.getUrl();
-//                LogMgr.e("core-web", "prevUrl: " + prevUrl);
                 boolean isRedirected = !isPageFinished(prevUrl);
-                if (isRedirected) {// 如果initialUrl被重定向了，则跳出方法体。
-//                    LogMgr.d("core-web", "BaseWebViewPresenter onPageStarted # is redirected");
+                // 如果initialUrl被重定向了，则跳出方法体。
+                if (isRedirected) {// TODO: 2016/11/11 经测试只能捕捉首次打开的URL，页面内跳转时的重定向捕捉不到。
                     return;
                 }
                 mPageFinished.put(url, false);
@@ -143,7 +141,9 @@ public class BaseWebViewPresenter implements IPresenter {
                 String prevUrl = view.getUrl();
                 boolean isAutoRedirect = !isPageFinished(prevUrl);
                 if (isAutoRedirect) {// 如果是自动重定向，则交给webview处理。
-                    LogMgr.d("core-web", "BaseWebViewPresenter shouldOverrideUrlLoading # auto redirect " + url);
+                    if (LogMgr.DEBUG) {
+                        LogMgr.d("core-web", "BaseWebViewPresenter shouldOverrideUrlLoading # auto redirect " + url);
+                    }
                     return super.shouldOverrideUrlLoading(view, url);
                 }
                 return mBaseView.onOverrideUrl(url);
@@ -305,6 +305,11 @@ public class BaseWebViewPresenter implements IPresenter {
     }
 
     @Override
+    public boolean isProgressEnabled() {
+        return mBaseView.isProgressEnabled();
+    }
+
+    @Override
     public WebView getWebView() {
         return mWebView;
     }
@@ -317,6 +322,11 @@ public class BaseWebViewPresenter implements IPresenter {
     @Override
     public String getTitle() {
         return mWebView.getTitle();
+    }
+
+    @Override
+    public int getContentHeight() {
+        return mWebView.getContentHeight();
     }
 
     @Override
@@ -341,13 +351,6 @@ public class BaseWebViewPresenter implements IPresenter {
 
     @Override
     public void switchErrorView(int errorCode, String description, String failingUrl) {
-        if (mBaseView.isProgressEnabled()) {
-            int height = mWebView.getContentHeight();
-//            LogMgr.e("core-web", "height: " + height);
-            if (height > DimenCons.SCREEN_HEIGHT_ABSOLUTE) {// FIXME: 2016/11/10 当contentHeight>screenHeight时跳出方法提，但是这样的判断可能会存在问题，如contentHeight本身就没screenHeight大又或者其他不确定因素
-                return;
-            }
-        }
         mIsError = true;
         if (!mBaseView.isProgressEnabled()) {
             mBaseView.hideLoading();
