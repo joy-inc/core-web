@@ -87,6 +87,10 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
         getUIDelegate().setTitle(title);
     }
 
+    public void setTitle(CharSequence title, boolean stable) {
+        getUIDelegate().setTitle(title, stable);
+    }
+
     public String getTitleText() {
         return getUIDelegate().getTitle();
     }

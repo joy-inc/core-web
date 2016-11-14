@@ -3,6 +3,7 @@ package com.joy.webview.ui;
 import android.annotation.TargetApi;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -59,6 +60,9 @@ public class UIDelegate {
     TextView mTvTitle;
     boolean mTitleMoreEnable;
     boolean mTitleCloseEnable;
+    Drawable mTitleBackIcon;
+    Drawable mTitleMoreIcon;
+    Drawable mTitleCloseIcon;
     boolean mProgressEnable;
     ImageButton mIbTitleMore;
     ImageButton mIbTitleClose;
@@ -84,9 +88,12 @@ public class UIDelegate {
     void resolveThemeAttribute() {
         TypedArray themeTa = mActivity.obtainStyledAttributes(R.styleable.Theme);
         mLongClickable = themeTa.getBoolean(R.styleable.Theme_longClickable, true);
-        mTitleMoreEnable = themeTa.getBoolean(R.styleable.Theme_titleMoreEnable, true);
-        mTitleCloseEnable = themeTa.getBoolean(R.styleable.Theme_titleCloseEnable, true);
         mProgressEnable = themeTa.getBoolean(R.styleable.Theme_progressEnable, false);
+        mTitleBackIcon = themeTa.getDrawable(R.styleable.Theme_titleBackIcon);
+        mTitleMoreIcon = themeTa.getDrawable(R.styleable.Theme_titleMoreIcon);
+        mTitleCloseIcon = themeTa.getDrawable(R.styleable.Theme_titleCloseIcon);
+        mTitleMoreEnable = mTitleMoreIcon != null;
+        mTitleCloseEnable = mTitleCloseIcon != null;
         themeTa.recycle();
 
         TypedArray navTa = mActivity.obtainStyledAttributes(R.styleable.NavigationBar);
@@ -108,13 +115,15 @@ public class UIDelegate {
 
     void initTitleView() {
         if (!mActivity.isNoTitle()) {
-            mActivity.addTitleLeftBackView((v) -> mPresenter.goBack());
+            if (mTitleBackIcon != null) {
+                mActivity.addTitleLeftView(mTitleBackIcon, (v) -> mPresenter.goBack());
+            }
             if (mTitleMoreEnable) {
-                mIbTitleMore = mActivity.addTitleRightMoreView(getTitleMoreClickListener());
+                mIbTitleMore = mActivity.addTitleRightView(mTitleMoreIcon, getTitleMoreClickListener());
                 mIbTitleMore.setAlpha(0.f);
             }
             if (mTitleCloseEnable) {
-                mIbTitleClose = mActivity.addTitleRightView(R.drawable.ic_close_white_24dp, getTitleCloseClickListener());
+                mIbTitleClose = mActivity.addTitleRightView(mTitleCloseIcon, getTitleCloseClickListener());
                 mIbTitleClose.setAlpha(0.f);
             }
             if (mTitleMoreEnable && mTitleCloseEnable) {
@@ -124,6 +133,9 @@ public class UIDelegate {
             mTvTitle = mActivity.addTitleMiddleView(mTitle);
             if (TextUtil.isEmpty(mTitle)) {
                 mTvTitle.setAlpha(0.f);
+            }
+            if (mTitleBackIcon == null) {
+                ((Toolbar.LayoutParams) mTvTitle.getLayoutParams()).leftMargin = HORIZONTAL_MARGINS;
             }
             if (mActivity.getToolbar().getChildCount() == 2) {
                 ((Toolbar.LayoutParams) mTvTitle.getLayoutParams()).rightMargin = HORIZONTAL_MARGINS;
@@ -193,6 +205,13 @@ public class UIDelegate {
     }
 
     void setTitle(CharSequence title) {
+        setTitle(title, false);
+    }
+
+    void setTitle(CharSequence title, boolean stable) {
+        if (stable) {
+            mTitle = title;
+        }
         AnimatorUtils.fadeIn(mTvTitle, title);
     }
 

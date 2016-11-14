@@ -2,8 +2,9 @@
 <resources>
 
     <style name="base_theme.web">
-        <item name="titleMoreEnable">true</item>
-        <item name="titleCloseEnable">true</item>
+        <item name="titleBackIcon">@drawable/ic_arrow_back_white_24dp</item>
+        <item name="titleMoreIcon">@drawable/ic_more_vert_white_24dp</item>
+        <item name="titleCloseIcon">@drawable/ic_close_white_24dp</item>
         <item name="navDisplay">false</item>
         <item name="navAnimate">true</item>
         <item name="navHeight">@dimen/def_toolbar_height</item>
