@@ -422,10 +422,11 @@ public class BaseWebX5Presenter implements IPresenter {
                         }
                         return;
                     }
-                    if (goBackOrForward(steps)) {
-                        return;
-                    }
+                    goBackOrForward(steps);
+                } else {
+                    mBaseView.finish();
                 }
+                return;
             }
             if (goBackOrForward(steps)) {
                 return;
