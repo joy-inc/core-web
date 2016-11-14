@@ -412,10 +412,11 @@ public class BaseWebViewPresenter implements IPresenter {
                         }
                         return;
                     }
-                    if (goBackOrForward(steps)) {
-                        return;
-                    }
+                    goBackOrForward(steps);
+                } else {
+                    mBaseView.finish();
                 }
+                return;
             }
             if (goBackOrForward(steps)) {
                 return;
