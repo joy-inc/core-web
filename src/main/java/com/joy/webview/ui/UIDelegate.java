@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.annotation.ColorInt;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
@@ -116,7 +117,7 @@ public class UIDelegate {
     void initTitleView() {
         if (!mActivity.isNoTitle()) {
             if (mTitleBackIcon != null) {
-                mActivity.addTitleLeftView(mTitleBackIcon, (v) -> mPresenter.goBack());
+                mActivity.addTitleLeftView(mTitleBackIcon, getTitleBackClickListener());
             }
             if (mTitleMoreEnable) {
                 mIbTitleMore = mActivity.addTitleRightView(mTitleMoreIcon, getTitleMoreClickListener());
@@ -157,6 +158,14 @@ public class UIDelegate {
         mJoyShare.dismiss();
     }
 
+    void onTitleBackClick() {
+        mPresenter.goBack();
+    }
+
+    private View.OnClickListener getTitleBackClickListener() {
+        return (v) -> mBaseView.onTitleBackClick();
+    }
+
     void setTitleMoreEnable(boolean enable) {
         mTitleMoreEnable = enable;
     }
@@ -165,7 +174,7 @@ public class UIDelegate {
         mJoyShare.show();
     }
 
-    View.OnClickListener getTitleMoreClickListener() {
+    private View.OnClickListener getTitleMoreClickListener() {
         return (v) -> {
             if (v.getAlpha() == 1.f)
                 mBaseView.onTitleMoreClick();
@@ -180,7 +189,7 @@ public class UIDelegate {
         mActivity.finish();
     }
 
-    View.OnClickListener getTitleCloseClickListener() {
+    private View.OnClickListener getTitleCloseClickListener() {
         return (v) -> {
             if (v.getAlpha() == 1.f)
                 mBaseView.onTitleCloseClick();
@@ -213,6 +222,14 @@ public class UIDelegate {
             mTitle = title;
         }
         AnimatorUtils.fadeIn(mTvTitle, title);
+    }
+
+    public String getTitle() {
+        return mPresenter.getTitle();
+    }
+
+    void setTitleColor(@ColorInt int color) {
+        mTvTitle.setTextColor(color);
     }
 
     boolean isProgressEnabled() {
@@ -353,10 +370,6 @@ public class UIDelegate {
 
     public String getUrl() {
         return mPresenter.getUrl();
-    }
-
-    public String getTitle() {
-        return mPresenter.getTitle();
     }
 
     public NavigationBar getNavigationBar() {

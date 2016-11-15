@@ -51,6 +51,8 @@ public interface BaseViewWeb extends BaseViewNet {
 
     void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY);
 
+    void onTitleBackClick();
+
     void onTitleMoreClick();
 
     void onTitleCloseClick();

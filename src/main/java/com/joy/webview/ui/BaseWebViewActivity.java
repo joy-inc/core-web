@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -93,6 +94,16 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
 
     public String getTitleText() {
         return getUIDelegate().getTitle();
+    }
+
+    @Override
+    public void setTitleColor(@ColorInt int color) {
+        getUIDelegate().setTitleColor(color);
+    }
+
+    @Override
+    public void onTitleBackClick() {
+        getUIDelegate().onTitleBackClick();
     }
 
     public void setTitleMoreEnable(boolean enalbe) {
