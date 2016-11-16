@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.webkit.ValueCallback;
+import android.widget.FrameLayout.LayoutParams;
 import android.widget.ProgressBar;
 
 import com.joy.inject.module.ActivityModule;
@@ -135,12 +136,33 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     }
 
     @Override
+    @Nullable
     public NavigationBar initNavigationBar() {
         return getUIDelegate().initNavigationBar();
     }
 
     public final NavigationBar getNavigationBar() {
         return getUIDelegate().getNavigationBar();
+    }
+
+    public final void addNavigationBar(@NonNull NavigationBar navBar) {
+        getUIDelegate().addNavigationBar(navBar);
+    }
+
+    public final void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp) {
+        getUIDelegate().addNavigationBar(navBar, lp);
+    }
+
+    public final void addNavigationBar(@NonNull NavigationBar navBar, boolean animate) {
+        getUIDelegate().addNavigationBar(navBar, animate);
+    }
+
+    public final void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp, boolean animate) {
+        getUIDelegate().addNavigationBar(navBar, lp, animate);
+    }
+
+    public final void setNavigationBarVisible(boolean visible) {
+        getUIDelegate().setNavigationBarVisible(visible);
     }
 
     public final IPresenter getPresenter() {

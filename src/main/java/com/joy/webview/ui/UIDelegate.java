@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
@@ -21,6 +23,7 @@ import com.joy.ui.activity.BaseUiActivity;
 import com.joy.utils.LayoutInflater;
 import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
+import com.joy.utils.ViewUtil;
 import com.joy.webview.R;
 import com.joy.webview.presenter.IPresenter;
 import com.joy.webview.ui.interfaces.BaseViewWeb;
@@ -257,18 +260,65 @@ public class UIDelegate {
     private void addNavBarIfNecessary() {
         if (mNavDisplay) {
             mNavBar = mBaseView.initNavigationBar();
-            if (mNavAnimate) {
-                mNavBar.setAlpha(0.f);
-                mNavBar.setTranslationY(mNavHeight);
-            } else {
-                mActivity.getContentViewLp().bottomMargin = mNavHeight - mNavElevation;
+            if (mNavBar != null) {
+                addNavigationBar(mNavBar, generateNavBarLp(), mNavAnimate, false);
             }
-            LayoutParams navBarLp = new LayoutParams(MATCH_PARENT, mNavHeight);
-            navBarLp.gravity = Gravity.BOTTOM;
-            mActivity.addContentView(mNavBar, navBarLp);
         }
     }
 
+    void addNavigationBar(@NonNull NavigationBar navBar) {
+        addNavigationBar(navBar, generateNavBarLp(), mNavAnimate);
+    }
+
+    void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp) {
+        addNavigationBar(navBar, lp, mNavAnimate);
+    }
+
+    void addNavigationBar(@NonNull NavigationBar navBar, boolean animate) {
+        addNavigationBar(navBar, generateNavBarLp(), animate);
+    }
+
+    void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp, boolean animate) {
+        addNavigationBar(navBar, lp, animate, true);
+    }
+
+    private void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp, boolean animate, boolean showLater) {
+        if (animate) {
+            navBar.setAlpha(0.f);
+            navBar.setTranslationY(lp.height);
+        } else {
+            mActivity.getContentViewLp().bottomMargin = lp.height - mNavElevation;
+        }
+        mActivity.addContentView(navBar, lp);
+        if (animate && showLater) {
+            navBar.runEnterAnimator();
+        }
+        mNavDisplay = true;
+        mNavBar = navBar;
+        mNavHeight = lp.height;
+        mNavAnimate = animate;
+    }
+
+    private LayoutParams generateNavBarLp() {
+        LayoutParams lp = new LayoutParams(MATCH_PARENT, mNavHeight);
+        lp.gravity = Gravity.BOTTOM;
+        return lp;
+    }
+
+    void setNavigationBarVisible(boolean visible) {
+        if (mNavBar == null) {
+            throw new NullPointerException("NavigationBar is null.");
+        }
+        if (visible) {
+            ViewUtil.showView(mNavBar);
+            mActivity.getContentViewLp().bottomMargin = mNavHeight - mNavElevation;
+        } else {
+            ViewUtil.hideView(mNavBar);
+            mActivity.getContentViewLp().bottomMargin = 0;
+        }
+    }
+
+    @Nullable
     NavigationBar initNavigationBar() {
         NavigationBar navBar = LayoutInflater.inflate(mActivity, R.layout.lib_view_web_navigation_bar);
         navBar.findViewById(R.id.ivNav1).setOnClickListener((v1) -> mPresenter.goBack());
@@ -289,7 +339,7 @@ public class UIDelegate {
         if (LogMgr.DEBUG) {
             LogMgr.d("core-web", mActivity.getClass().getSimpleName() + " onPageFinished # url: " + url);
         }
-        if (mNavDisplay && mNavAnimate) {
+        if (mNavDisplay && mNavAnimate && mNavBar != null) {
             mNavBar.runEnterAnimator();
         }
     }
@@ -343,7 +393,7 @@ public class UIDelegate {
     }
 
     void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-        if (mNavDisplay && mNavAnimate) {
+        if (mNavDisplay && mNavAnimate && mNavBar != null) {
             if (scrollY > oldScrollY) {// to down
                 mNavBar.runExitAnimator();
             } else {// to up
