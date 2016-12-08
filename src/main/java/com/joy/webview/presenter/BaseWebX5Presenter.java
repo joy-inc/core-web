@@ -213,8 +213,14 @@ public class BaseWebX5Presenter implements IPresenter {
             @JavascriptInterface
             @WorkerThread
             @Override
-            public void receivedHtml(String html) {
-                mWebView.post(() -> onReceivedHtml(html));
+            public void receivedHtml(final String html) {
+//                mWebView.post(() -> onReceivedHtml(html));
+                mWebView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        onReceivedHtml(html);
+                    }
+                });
             }
         }, "htmlSource");
     }
@@ -326,7 +332,7 @@ public class BaseWebX5Presenter implements IPresenter {
 
     @Override
     public String getUrl() {
-        return mWebView.getUrl();
+        return mWebView.getUrl() == null ? "" : mWebView.getUrl();
     }
 
     @Override
