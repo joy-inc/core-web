@@ -25,7 +25,6 @@ import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
 import com.joy.utils.ViewUtil;
 import com.joy.webview.R;
-import com.joy.webview.presenter.IPresenter;
 import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.joy.webview.utils.AnimatorUtils;
 import com.joy.webview.view.NavigationBar;
@@ -56,9 +55,6 @@ public class UIDelegate {
     @Inject
     BaseUiActivity mActivity;
 
-    @Inject
-    IPresenter mPresenter;
-
     String mUrl;
     CharSequence mTitle;
     TextView mTvTitle;
@@ -85,8 +81,8 @@ public class UIDelegate {
     }
 
     void onCreate() {
-        mActivity.setContentView(mPresenter.getWebView());
-        mPresenter.load(mUrl);
+        mActivity.setContentView(mBaseView.getPresenter().getWebView());
+        mBaseView.getPresenter().load(mUrl);
     }
 
     void resolveThemeAttribute() {
@@ -148,33 +144,33 @@ public class UIDelegate {
     }
 
     void initContentView() {
-        mPresenter.getWebView().setOnLongClickListener((v) -> !mLongClickable);
+        mBaseView.getPresenter().getWebView().setOnLongClickListener((v) -> !mLongClickable);
         addProgressBarIfNecessary();
         addNavBarIfNecessary();
     }
 
-    List<ShareItem> getShareItems() {
+    public JoyShare getJoyShare() {
+        return mJoyShare;
+    }
+
+    public List<ShareItem> getDefaultShareItems() {
         return mJoyShare.getDefaultItems();
     }
 
-    void onShareItemClick(int position, View v, ShareItem item) {
-        mJoyShare.dismiss();
+    public void showShare() {
+        mJoyShare.show();
     }
 
-    void onTitleBackClick() {
-        mPresenter.goBack();
+    public void dismissShare() {
+        mJoyShare.dismiss();
     }
 
     private View.OnClickListener getTitleBackClickListener() {
         return (v) -> mBaseView.onTitleBackClick();
     }
 
-    void setTitleMoreEnable(boolean enable) {
+    public void setTitleMoreEnable(boolean enable) {
         mTitleMoreEnable = enable;
-    }
-
-    void onTitleMoreClick() {
-        mJoyShare.show();
     }
 
     private View.OnClickListener getTitleMoreClickListener() {
@@ -184,12 +180,8 @@ public class UIDelegate {
         };
     }
 
-    void setTitleCloseEnable(boolean enable) {
+    public void setTitleCloseEnable(boolean enable) {
         mTitleCloseEnable = enable;
-    }
-
-    void onTitleCloseClick() {
-        mActivity.finish();
     }
 
     private View.OnClickListener getTitleCloseClickListener() {
@@ -199,43 +191,43 @@ public class UIDelegate {
         };
     }
 
-    void fadeInTitleMore() {
-        AnimatorUtils.fadeIn(mIbTitleMore, 200);
+    public void fadeInTitleClose(long delay) {
+        AnimatorUtils.fadeIn(mIbTitleClose, delay);
     }
 
-    void fadeInTitleAll() {
+    public void fadeInTitleMore(long delay) {
+        AnimatorUtils.fadeIn(mIbTitleMore, delay);
+    }
+
+    public void fadeInTitleAll() {
         if (mTitleCloseEnable) {
-            AnimatorUtils.fadeIn(mIbTitleClose, 200);
+            fadeInTitleClose(200);
             if (mTitleMoreEnable) {
-                AnimatorUtils.fadeIn(mIbTitleMore, 400);
+                fadeInTitleMore(400);
             }
         } else {
             if (mTitleMoreEnable) {
-                AnimatorUtils.fadeIn(mIbTitleMore, 200);
+                fadeInTitleMore(200);
             }
         }
     }
 
-    void setTitle(CharSequence title) {
+    public void setTitle(CharSequence title) {
         setTitle(title, false);
     }
 
-    void setTitle(CharSequence title, boolean stable) {
-        if (stable) {
+    public void setTitle(CharSequence title, boolean fixed) {
+        if (fixed) {
             mTitle = title;
         }
         AnimatorUtils.fadeIn(mTvTitle, title);
     }
 
-    public String getTitle() {
-        return mPresenter.getTitle();
-    }
-
-    void setTitleColor(@ColorInt int color) {
+    public void setTitleColor(@ColorInt int color) {
         mTvTitle.setTextColor(color);
     }
 
-    boolean isProgressEnabled() {
+    public boolean isProgressEnabled() {
         return mProgressEnable;
     }
 
@@ -266,19 +258,19 @@ public class UIDelegate {
         }
     }
 
-    void addNavigationBar(@NonNull NavigationBar navBar) {
+    public void addNavigationBar(@NonNull NavigationBar navBar) {
         addNavigationBar(navBar, generateNavBarLp(), mNavAnimate);
     }
 
-    void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp) {
+    public void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp) {
         addNavigationBar(navBar, lp, mNavAnimate);
     }
 
-    void addNavigationBar(@NonNull NavigationBar navBar, boolean animate) {
+    public void addNavigationBar(@NonNull NavigationBar navBar, boolean animate) {
         addNavigationBar(navBar, generateNavBarLp(), animate);
     }
 
-    void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp, boolean animate) {
+    public void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp, boolean animate) {
         addNavigationBar(navBar, lp, animate, true);
     }
 
@@ -305,7 +297,7 @@ public class UIDelegate {
         return lp;
     }
 
-    void setNavigationBarVisible(boolean visible) {
+    public void setNavigationBarVisible(boolean visible) {
         if (mNavBar == null) {
             throw new NullPointerException("NavigationBar is null.");
         }
@@ -321,9 +313,9 @@ public class UIDelegate {
     @Nullable
     NavigationBar initNavigationBar() {
         NavigationBar navBar = LayoutInflater.inflate(mActivity, R.layout.lib_view_web_navigation_bar);
-        navBar.findViewById(R.id.ivNav1).setOnClickListener((v1) -> mPresenter.goBack());
+        navBar.findViewById(R.id.ivNav1).setOnClickListener((v1) -> mBaseView.getPresenter().goBack());
         navBar.findViewById(R.id.ivNav2).setOnClickListener((v1) -> mActivity.finish());
-        navBar.findViewById(R.id.ivNav3).setOnClickListener((v1) -> mPresenter.goForward());
+        navBar.findViewById(R.id.ivNav3).setOnClickListener((v1) -> mBaseView.getPresenter().goForward());
         navBar.findViewById(R.id.ivNav4).setOnClickListener((v1) -> mJoyShare.show());
         return navBar;
     }
@@ -400,26 +392,6 @@ public class UIDelegate {
                 mNavBar.runEnterAnimator();
             }
         }
-    }
-
-    void onBackPressed() {
-        mPresenter.goBack();
-    }
-
-    void load() {
-        mPresenter.load(mUrl);
-    }
-
-    void reload() {
-        mPresenter.reload();
-    }
-
-    IPresenter getPresenter() {
-        return mPresenter;
-    }
-
-    public String getUrl() {
-        return mPresenter.getUrl();
     }
 
     public NavigationBar getNavigationBar() {

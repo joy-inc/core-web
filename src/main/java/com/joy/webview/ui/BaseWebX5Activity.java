@@ -39,6 +39,9 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb, KConstant {
 
     @Inject
+    IPresenter mPresenter;
+
+    @Inject
     UIDelegate mDelegate;
 
     private BaseWebX5Component component() {
@@ -48,6 +51,12 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
                 .build();
     }
 
+    @Override
+    public final IPresenter getPresenter() {
+        return mPresenter;
+    }
+
+    @Override
     public final UIDelegate getUIDelegate() {
         return mDelegate;
     }
@@ -81,7 +90,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     }
 
     public final String getUrl() {
-        return getUIDelegate().getUrl();
+        return getPresenter().getUrl();
     }
 
     @Override
@@ -89,12 +98,12 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         getUIDelegate().setTitle(title);
     }
 
-    public void setTitle(CharSequence title, boolean stable) {
-        getUIDelegate().setTitle(title, stable);
+    public void setTitle(CharSequence title, boolean fixed) {
+        getUIDelegate().setTitle(title, fixed);
     }
 
     public String getTitleText() {
-        return getUIDelegate().getTitle();
+        return getPresenter().getTitle();
     }
 
     @Override
@@ -104,7 +113,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     public void onTitleBackClick() {
-        getUIDelegate().onTitleBackClick();
+        getPresenter().goBack();
     }
 
     public void setTitleMoreEnable(boolean enalbe) {
@@ -113,7 +122,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     public void onTitleMoreClick() {
-        getUIDelegate().onTitleMoreClick();
+        getUIDelegate().showShare();
     }
 
     public void setTitleCloseEnable(boolean enable) {
@@ -122,7 +131,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     public void onTitleCloseClick() {
-        getUIDelegate().onTitleCloseClick();
+        finish();
     }
 
     @Override
@@ -165,23 +174,39 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         getUIDelegate().setNavigationBarVisible(visible);
     }
 
-    public final IPresenter getPresenter() {
-        return getUIDelegate().getPresenter();
+    @Override
+    public List<ShareItem> getShareItems() {
+        return getUIDelegate().getDefaultShareItems();
     }
 
     @Override
-    public List<ShareItem> getShareItems() {
-        return getUIDelegate().getShareItems();
+    public final void addShareItem(ShareItem item) {
+        getUIDelegate().getJoyShare().add(item);
+    }
+
+    @Override
+    public final void addShareItem(int position, ShareItem item) {
+        getUIDelegate().getJoyShare().add(position, item);
+    }
+
+    @Override
+    public final void addShareItems(List<ShareItem> items) {
+        getUIDelegate().getJoyShare().addAll(items);
+    }
+
+    @Override
+    public final void addShareItems(int position, List<ShareItem> items) {
+        getUIDelegate().getJoyShare().addAll(position, items);
     }
 
     @Override
     public void onShareItemClick(int position, View v, ShareItem item) {
-        getUIDelegate().onShareItemClick(position, v, item);
+        getUIDelegate().dismissShare();
     }
 
     @Override
     public void doOnRetry() {
-        getUIDelegate().reload();
+        getPresenter().reload();
     }
 
     @Override
@@ -248,11 +273,15 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     public void onBackPressed() {
-        getUIDelegate().onBackPressed();
+        getPresenter().goBack();
     }
 
     public static void startSelf(@NonNull Context context, @NonNull String url) {
         startSelf(context, url, false);
+    }
+
+    public static void startSelf(@NonNull Context context, @NonNull String url, @Nullable CharSequence title) {
+        startSelf(context, url, title, false);
     }
 
     public static void startSelf(@NonNull Context context, @NonNull String url, boolean cacheEnable) {
@@ -265,6 +294,10 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     public static void startTarget(Class<? extends BaseWebX5Activity> target, @NonNull Context context, @NonNull String url) {
         startTarget(target, context, url, false);
+    }
+
+    public static void startTarget(Class<? extends BaseWebX5Activity> target, @NonNull Context context, @NonNull String url, @Nullable CharSequence title) {
+        startTarget(target, context, url, title, false);
     }
 
     public static void startTarget(Class<? extends BaseWebX5Activity> target, @NonNull Context context, @NonNull String url, boolean cacheEnable) {

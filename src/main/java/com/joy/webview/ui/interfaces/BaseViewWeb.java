@@ -9,6 +9,8 @@ import android.widget.ProgressBar;
 
 import com.joy.share.ShareItem;
 import com.joy.ui.activity.interfaces.BaseViewNet;
+import com.joy.webview.presenter.IPresenter;
+import com.joy.webview.ui.UIDelegate;
 import com.joy.webview.view.NavigationBar;
 
 import java.util.List;
@@ -21,6 +23,10 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
  */
 
 public interface BaseViewWeb extends BaseViewNet {
+
+    IPresenter getPresenter();
+
+    UIDelegate getUIDelegate();
 
     boolean isProgressEnabled();
 
@@ -62,6 +68,14 @@ public interface BaseViewWeb extends BaseViewNet {
     NavigationBar initNavigationBar();
 
     List<ShareItem> getShareItems();
+
+    void addShareItem(ShareItem item);
+
+    void addShareItem(int position, ShareItem item);
+
+    void addShareItems(List<ShareItem> items);
+
+    void addShareItems(int position, List<ShareItem> items);
 
     void onShareItemClick(int position, View v, ShareItem item);
 }

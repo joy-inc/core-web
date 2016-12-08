@@ -18,6 +18,9 @@
         <item name="navIconBackground">@drawable/selector_bg_click_material_dark</item>
         <item name="progressEnable">false</item>
         <item name="progressHeight">2dp</item>
+        <item name="spanColumn">4</item>
+        <item name="verticalSpacing">16dp</item>
+        <item name="parentPadding">24dp</item>
     </style>
 
 </resources>
