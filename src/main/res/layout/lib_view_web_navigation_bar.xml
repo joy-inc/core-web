@@ -54,5 +54,15 @@
             android:background="?navIconBackground"
             android:scaleType="centerInside"
             android:src="?navIconFourth" />
+
+        <ImageView
+            android:id="@+id/ivNav5"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:alpha="?navIconAlpha"
+            android:background="?navIconBackground"
+            android:scaleType="centerInside"
+            android:src="?navIconFifth" />
     </LinearLayout>
 </com.joy.webview.view.NavigationBar>

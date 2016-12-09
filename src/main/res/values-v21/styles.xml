@@ -14,6 +14,7 @@
         <item name="navIconSecond">@drawable/ic_close_black_24dp</item>
         <item name="navIconThird">@drawable/ic_chevron_right_black_24dp</item>
         <item name="navIconFourth">@drawable/ic_more_horiz_black_24dp</item>
+        <item name="navIconFifth">@null</item>
         <item name="navIconAlpha">0.55</item>
         <item name="navIconBackground">@drawable/selector_bg_click_material_dark</item>
         <item name="progressEnable">false</item>

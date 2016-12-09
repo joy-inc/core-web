@@ -19,6 +19,7 @@
         <attr name="navIconSecond" format="reference" />
         <attr name="navIconThird" format="reference" />
         <attr name="navIconFourth" format="reference" />
+        <attr name="navIconFifth" format="reference" />
         <attr name="navIconBackground" format="reference" />
         <attr name="navIconAlpha" format="float" />
     </declare-styleable>

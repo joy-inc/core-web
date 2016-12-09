@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.joy.share.JoyShare;
 import com.joy.share.ShareItem;
+import com.joy.share.ShareUtil;
 import com.joy.ui.activity.BaseUiActivity;
 import com.joy.utils.LayoutInflater;
 import com.joy.utils.LogMgr;
@@ -155,6 +156,28 @@ public class UIDelegate {
 
     public List<ShareItem> getDefaultShareItems() {
         return mJoyShare.getDefaultItems();
+    }
+
+    void onShareItemClick(ShareItem item) {
+        dismissShare();
+        ShareItem.DEFAULT def = item.mDefault;
+        if (def != null) {
+            String curUrl = mBaseView.getPresenter().getUrl();
+            String curTitle = mBaseView.getPresenter().getTitle();
+            switch (def) {
+                case COPY_LINK:
+                    ShareUtil.copyUrl(mActivity, curUrl);
+                    break;
+                case BROWSER:
+                    ShareUtil.openBrowser(mActivity, curUrl);
+                    break;
+                case MORE:
+                    ShareUtil.shareTextUrl(mActivity, curUrl, curTitle);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     public void showShare() {

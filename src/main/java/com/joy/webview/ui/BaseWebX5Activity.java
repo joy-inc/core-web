@@ -201,7 +201,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     public void onShareItemClick(int position, View v, ShareItem item) {
-        getUIDelegate().dismissShare();
+        getUIDelegate().onShareItemClick(item);
     }
 
     @Override
