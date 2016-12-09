@@ -200,8 +200,8 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     }
 
     @Override
-    public void onShareItemClick(int position, View v, ShareItem item) {
-        getUIDelegate().onShareItemClick(item);
+    public boolean onShareItemClick(int position, View v, ShareItem item) {
+        return getUIDelegate().onShareItemClick(item);
     }
 
     @Override

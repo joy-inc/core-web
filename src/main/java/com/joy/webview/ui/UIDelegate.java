@@ -158,7 +158,7 @@ public class UIDelegate {
         return mJoyShare.getDefaultItems();
     }
 
-    void onShareItemClick(ShareItem item) {
+    boolean onShareItemClick(ShareItem item) {
         dismissShare();
         ShareItem.DEFAULT def = item.mDefault;
         if (def != null) {
@@ -167,17 +167,18 @@ public class UIDelegate {
             switch (def) {
                 case COPY_LINK:
                     ShareUtil.copyUrl(mActivity, curUrl);
-                    break;
+                    return true;
                 case BROWSER:
                     ShareUtil.openBrowser(mActivity, curUrl);
-                    break;
+                    return true;
                 case MORE:
                     ShareUtil.shareTextUrl(mActivity, curUrl, curTitle);
-                    break;
+                    return true;
                 default:
-                    break;
+                    return false;
             }
         }
+        return false;
     }
 
     public void showShare() {

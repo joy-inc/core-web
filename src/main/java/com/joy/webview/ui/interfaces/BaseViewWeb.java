@@ -77,5 +77,5 @@ public interface BaseViewWeb extends BaseViewNet {
 
     void addShareItems(int position, List<ShareItem> items);
 
-    void onShareItemClick(int position, View v, ShareItem item);
+    boolean onShareItemClick(int position, View v, ShareItem item);
 }
