@@ -12,9 +12,11 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.webkit.ValueCallback;
 import android.widget.FrameLayout.LayoutParams;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.joy.inject.module.ActivityModule;
+import com.joy.share.ShareAdapter;
 import com.joy.share.ShareItem;
 import com.joy.ui.activity.BaseHttpUiActivity;
 import com.joy.webview.component.BaseWebX5Component;
@@ -172,6 +174,15 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     public final void setNavigationBarVisible(boolean visible) {
         getUIDelegate().setNavigationBarVisible(visible);
+    }
+
+    @Override
+    public void onNavCustomItemClick(ImageView view) {
+    }
+
+    @Override
+    public final ShareAdapter getShareAdapter() {
+        return getUIDelegate().getJoyShare().getAdapter();
     }
 
     @Override

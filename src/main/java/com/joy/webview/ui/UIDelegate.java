@@ -14,6 +14,7 @@ import android.view.View;
 import android.webkit.ValueCallback;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -337,10 +338,11 @@ public class UIDelegate {
     @Nullable
     NavigationBar initNavigationBar() {
         NavigationBar navBar = LayoutInflater.inflate(mActivity, R.layout.lib_view_web_navigation_bar);
-        navBar.findViewById(R.id.ivNav1).setOnClickListener((v1) -> mBaseView.getPresenter().goBack());
-        navBar.findViewById(R.id.ivNav2).setOnClickListener((v1) -> mActivity.finish());
-        navBar.findViewById(R.id.ivNav3).setOnClickListener((v1) -> mBaseView.getPresenter().goForward());
-        navBar.findViewById(R.id.ivNav4).setOnClickListener((v1) -> mJoyShare.show());
+        navBar.getIvNav(0).setOnClickListener((v1) -> mBaseView.getPresenter().goBack());
+        navBar.getIvNav(1).setOnClickListener((v1) -> mActivity.finish());
+        navBar.getIvNav(2).setOnClickListener((v1) -> mBaseView.getPresenter().goForward());
+        navBar.getIvNav(3).setOnClickListener((v1) -> mBaseView.onNavCustomItemClick((ImageView) v1));
+        navBar.getIvNav(4).setOnClickListener((v1) -> mJoyShare.show());
         return navBar;
     }
 

@@ -5,8 +5,10 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.View;
 import android.webkit.ValueCallback;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.joy.share.ShareAdapter;
 import com.joy.share.ShareItem;
 import com.joy.ui.activity.interfaces.BaseViewNet;
 import com.joy.webview.presenter.IPresenter;
@@ -66,6 +68,10 @@ public interface BaseViewWeb extends BaseViewNet {
     ProgressBar initProgressBar();
 
     NavigationBar initNavigationBar();
+
+    void onNavCustomItemClick(ImageView view);
+
+    ShareAdapter getShareAdapter();
 
     List<ShareItem> getShareItems();
 
