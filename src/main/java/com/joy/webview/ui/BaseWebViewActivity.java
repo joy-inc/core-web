@@ -91,6 +91,10 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
         getUIDelegate().initContentView();
     }
 
+    public final String getInitialUrl() {
+        return getUIDelegate().getInitialUrl();
+    }
+
     public final String getUrl() {
         return getPresenter().getUrl();
     }

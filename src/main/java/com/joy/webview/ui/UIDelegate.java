@@ -66,6 +66,7 @@ public class UIDelegate {
     Drawable mTitleMoreIcon;
     Drawable mTitleCloseIcon;
     boolean mProgressEnable;
+    ImageButton mIbTitleBack;
     ImageButton mIbTitleMore;
     ImageButton mIbTitleClose;
     JoyShare mJoyShare;
@@ -118,7 +119,7 @@ public class UIDelegate {
     void initTitleView() {
         if (!mActivity.isNoTitle()) {
             if (mTitleBackIcon != null) {
-                mActivity.addTitleLeftView(mTitleBackIcon, getTitleBackClickListener());
+                mIbTitleBack = mActivity.addTitleLeftView(mTitleBackIcon, getTitleBackClickListener());
             }
             if (mTitleMoreEnable) {
                 mIbTitleMore = mActivity.addTitleRightView(mTitleMoreIcon, getTitleMoreClickListener());
@@ -422,5 +423,21 @@ public class UIDelegate {
 
     public NavigationBar getNavigationBar() {
         return mNavBar;
+    }
+
+    public String getInitialUrl() {
+        return mUrl;
+    }
+
+    public ImageButton getTitleBackBtn() {
+        return mIbTitleBack;
+    }
+
+    public ImageButton getTitleCloseBtn() {
+        return mIbTitleClose;
+    }
+
+    public ImageButton getTitleMoreBtn() {
+        return mIbTitleMore;
     }
 }

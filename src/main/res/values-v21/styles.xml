@@ -19,9 +19,14 @@
         <item name="navIconBackground">@drawable/selector_bg_click_material_dark</item>
         <item name="progressEnable">false</item>
         <item name="progressHeight">2dp</item>
-        <item name="spanColumn">4</item>
-        <item name="verticalSpacing">16dp</item>
-        <item name="parentPadding">24dp</item>
+        <item name="shareColumn">4</item>
+        <item name="shareVerticalSpacing">16dp</item>
+        <item name="shareParentPadding">24dp</item>
+        <item name="shareIconWidth">42dp</item>
+        <item name="shareIconHeight">42dp</item>
+        <item name="shareTextSize">12dp</item>
+        <item name="shareTextColor">@color/black_trans40</item>
+        <item name="shareViewSpacing">6dp</item>
     </style>
 
 </resources>

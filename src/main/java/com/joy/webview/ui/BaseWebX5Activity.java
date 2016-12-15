@@ -95,6 +95,10 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         return getPresenter().getUrl();
     }
 
+    public final String getInitialUrl() {
+        return getUIDelegate().getInitialUrl();
+    }
+
     @Override
     public void setTitle(CharSequence title) {
         getUIDelegate().setTitle(title);
