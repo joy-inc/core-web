@@ -5,7 +5,6 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
@@ -60,13 +59,13 @@ public class UIDelegate {
     String mUrl;
     CharSequence mTitle;
     TextView mTvTitle;
-    boolean mTitleMoreEnable;
+    //    boolean mTitleMoreEnable;
     boolean mTitleCloseEnable;
-    Drawable mTitleBackIcon;
-    Drawable mTitleMoreIcon;
+    //    Drawable mTitleBackIcon;
+    //    Drawable mTitleMoreIcon;
     Drawable mTitleCloseIcon;
     boolean mProgressEnable;
-    ImageButton mIbTitleBack;
+    //    ImageButton mIbTitleBack;
     ImageButton mIbTitleMore;
     ImageButton mIbTitleClose;
     JoyShare mJoyShare;
@@ -92,10 +91,10 @@ public class UIDelegate {
         TypedArray themeTa = mActivity.obtainStyledAttributes(R.styleable.Theme);
         mLongClickable = themeTa.getBoolean(R.styleable.Theme_longClickable, true);
         mProgressEnable = themeTa.getBoolean(R.styleable.Theme_progressEnable, false);
-        mTitleBackIcon = themeTa.getDrawable(R.styleable.Theme_titleBackIcon);
-        mTitleMoreIcon = themeTa.getDrawable(R.styleable.Theme_titleMoreIcon);
+//        mTitleBackIcon = themeTa.getDrawable(R.styleable.Theme_titleBackIcon);
+//        mTitleMoreIcon = themeTa.getDrawable(R.styleable.Theme_titleMoreIcon);
         mTitleCloseIcon = themeTa.getDrawable(R.styleable.Theme_titleCloseIcon);
-        mTitleMoreEnable = mTitleMoreIcon != null;
+//        mTitleMoreEnable = mTitleMoreIcon != null;
         mTitleCloseEnable = mTitleCloseIcon != null;
         themeTa.recycle();
 
@@ -118,26 +117,30 @@ public class UIDelegate {
 
     void initTitleView() {
         if (!mActivity.isNoTitle()) {
-            if (mTitleBackIcon != null) {
-                mIbTitleBack = mActivity.addTitleLeftView(mTitleBackIcon, getTitleBackClickListener());
-            }
-            if (mTitleMoreEnable) {
-                mIbTitleMore = mActivity.addTitleRightView(mTitleMoreIcon, getTitleMoreClickListener());
+//            if (mTitleBackIcon != null) {
+//                mIbTitleBack = mActivity.addTitleLeftView(mTitleBackIcon, getTitleBackClickListener());
+//            }
+//            if (mTitleMoreEnable) {
+            if (mActivity.hasTitleMore()) {
+//                mIbTitleMore = mActivity.addTitleRightView(mTitleMoreIcon, getTitleMoreClickListener());
+                mIbTitleMore = mActivity.getTitleMoreView();
                 mIbTitleMore.setAlpha(0.f);
             }
             if (mTitleCloseEnable) {
                 mIbTitleClose = mActivity.addTitleRightView(mTitleCloseIcon, getTitleCloseClickListener());
                 mIbTitleClose.setAlpha(0.f);
             }
-            if (mTitleMoreEnable && mTitleCloseEnable) {
+            if (mActivity.hasTitleMore() && mTitleCloseEnable) {
                 mIbTitleMore.setMinimumWidth(DP_40);
                 mIbTitleClose.setMinimumWidth(DP_40);
             }
-            mTvTitle = mActivity.addTitleMiddleView(mTitle);
+//            mTvTitle = mActivity.addTitleMiddleView(mTitle);
+            mActivity.setTitle(mTitle);
+//            mTvTitle = mActivity.getTitleTextView();
             if (TextUtil.isEmpty(mTitle)) {
                 mTvTitle.setAlpha(0.f);
             }
-            if (mTitleBackIcon == null) {
+            if (!mActivity.hasTitleBack()) {
                 ((Toolbar.LayoutParams) mTvTitle.getLayoutParams()).leftMargin = HORIZONTAL_MARGINS;
             }
             if (mActivity.getToolbar().getChildCount() == 2) {
@@ -191,20 +194,20 @@ public class UIDelegate {
         mJoyShare.dismiss();
     }
 
-    private View.OnClickListener getTitleBackClickListener() {
-        return (v) -> mBaseView.onTitleBackClick();
-    }
+//    private View.OnClickListener getTitleBackClickListener() {
+//        return (v) -> mBaseView.onTitleBackClick();
+//    }
 
-    public void setTitleMoreEnable(boolean enable) {
-        mTitleMoreEnable = enable;
-    }
+//    public void setTitleMoreEnable(boolean enable) {
+//        mTitleMoreEnable = enable;
+//    }
 
-    private View.OnClickListener getTitleMoreClickListener() {
-        return (v) -> {
-            if (v.getAlpha() == 1.f)
-                mBaseView.onTitleMoreClick();
-        };
-    }
+//    private View.OnClickListener getTitleMoreClickListener() {
+//        return (v) -> {
+//            if (v.getAlpha() == 1.f)
+//                mBaseView.onTitleMoreClick();
+//        };
+//    }
 
     public void setTitleCloseEnable(boolean enable) {
         mTitleCloseEnable = enable;
@@ -228,11 +231,11 @@ public class UIDelegate {
     public void fadeInTitleAll() {
         if (mTitleCloseEnable) {
             fadeInTitleClose(200);
-            if (mTitleMoreEnable) {
+            if (mActivity.hasTitleMore()) {
                 fadeInTitleMore(400);
             }
         } else {
-            if (mTitleMoreEnable) {
+            if (mActivity.hasTitleMore()) {
                 fadeInTitleMore(200);
             }
         }
@@ -246,12 +249,13 @@ public class UIDelegate {
         if (fixed) {
             mTitle = title;
         }
+        mTvTitle = mActivity.getTitleTextView();
         AnimatorUtils.fadeIn(mTvTitle, title);
     }
 
-    public void setTitleColor(@ColorInt int color) {
-        mTvTitle.setTextColor(color);
-    }
+//    public void setTitleColor(@ColorInt int color) {
+//        mTvTitle.setTextColor(color);
+//    }
 
     public boolean isProgressEnabled() {
         return mProgressEnable;
@@ -429,15 +433,7 @@ public class UIDelegate {
         return mUrl;
     }
 
-    public ImageButton getTitleBackBtn() {
-        return mIbTitleBack;
-    }
-
     public ImageButton getTitleCloseBtn() {
         return mIbTitleClose;
-    }
-
-    public ImageButton getTitleMoreBtn() {
-        return mIbTitleMore;
     }
 }

@@ -4,8 +4,6 @@
         <attr name="longClickable" format="boolean" />
         <attr name="progressEnable" format="boolean" />
         <attr name="progressHeight" format="dimension" />
-        <attr name="titleBackIcon" format="reference" />
-        <attr name="titleMoreIcon" format="reference" />
         <attr name="titleCloseIcon" format="reference" />
     </declare-styleable>
 

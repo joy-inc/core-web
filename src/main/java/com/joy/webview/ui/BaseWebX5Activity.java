@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -83,6 +82,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     protected void initTitleView() {
+        super.initTitleView();
         getUIDelegate().initTitleView();
     }
 
@@ -101,10 +101,12 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     public void setTitle(CharSequence title) {
+        super.setTitle(title);
         getUIDelegate().setTitle(title);
     }
 
     public void setTitle(CharSequence title, boolean fixed) {
+        super.setTitle(title);
         getUIDelegate().setTitle(title, fixed);
     }
 
@@ -112,23 +114,25 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         return getPresenter().getTitle();
     }
 
-    @Override
-    public void setTitleColor(@ColorInt int color) {
-        getUIDelegate().setTitleColor(color);
-    }
+//    @Override
+//    public void setTitleColor(@ColorInt int color) {
+//        getUIDelegate().setTitleColor(color);
+//    }
 
     @Override
-    public void onTitleBackClick() {
+    public void onTitleBackClick(View v) {
         getPresenter().goBack();
     }
 
-    public void setTitleMoreEnable(boolean enalbe) {
-        getUIDelegate().setTitleMoreEnable(enalbe);
-    }
+//    public void setTitleMoreEnable(boolean enable) {
+//        getUIDelegate().setTitleMoreEnable(enable);
+//    }
 
     @Override
-    public void onTitleMoreClick() {
-        getUIDelegate().showShare();
+    public void onTitleMoreClick(View v) {
+        if (v.getAlpha() == 1.f) {
+            getUIDelegate().showShare();
+        }
     }
 
     public void setTitleCloseEnable(boolean enable) {
