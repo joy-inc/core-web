@@ -19,6 +19,7 @@ import com.joy.webview.utils.PayIntercepter;
 import com.joy.webview.utils.TimeoutHandler;
 import com.joy.webview.utils.UriUtils;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient.CustomViewCallback;
+import com.tencent.smtt.export.external.interfaces.WebResourceError;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebBackForwardList;
@@ -109,9 +110,11 @@ public class BaseWebX5Presenter implements IPresenter {
             }
 
             @Override
-            public void onReceivedError(WebView view, WebResourceRequest request, WebViewClient.a a) {
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
                 if (request.isForMainFrame()) {
-                    onReceivedError(view, -1, "", request.getUrl().toString());
+                    onReceivedError(view,
+                            error.getErrorCode(), error.getDescription().toString(),
+                            request.getUrl().toString());
                 }
             }
 
