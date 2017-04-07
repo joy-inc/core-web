@@ -12,6 +12,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
 import android.webkit.WebHistoryItem;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -72,9 +73,9 @@ public class BaseWebViewPresenter implements IPresenter {
         mWebView.setWebViewClient(new WebViewClient() {
 
             @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            public void onPageStarted(WebView webView, String url, Bitmap favicon) {
                 addTimeoutMessage();
-                String prevUrl = view.getUrl();
+                String prevUrl = webView.getUrl();
                 boolean isRedirected = !isPageFinished(prevUrl);
                 // 如果initialUrl被重定向了，则跳出方法体。
                 if (isRedirected) {// TODO: 2016/11/11 经测试只能捕捉首次打开的URL，页面内跳转时的重定向捕捉不到。
@@ -88,12 +89,12 @@ public class BaseWebViewPresenter implements IPresenter {
                     mBaseView.showLoading();
                 }
                 if (!mNeedSeedCookie) {
-                    mBaseView.onPageStarted(url, favicon);
+                    mBaseView.onPageStarted(webView, url, favicon);
                 }
             }
 
             @Override
-            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+            public void onReceivedError(WebView webView, int errorCode, String description, String failingUrl) {
                 if (isHostFinishing()) {
                     return;
                 }
@@ -107,13 +108,13 @@ public class BaseWebViewPresenter implements IPresenter {
             }
 
             @Override
-            public void onPageFinished(WebView view, String url) {
+            public void onPageFinished(WebView webView, String url) {
                 if (isHostFinishing()) {
                     return;
                 }
                 removeTimeoutMessage();
                 mPageFinished.put(url, true);
-                if (!url.equals(view.getUrl())) {// 如果当前URL和webview所持有的URL不一致时，抛掉当前URL的回调，跳出方法体。
+                if (!url.equals(webView.getUrl())) {// 如果当前URL和webview所持有的URL不一致时，抛掉当前URL的回调，跳出方法体。
                     return;
                 }
                 if (mNeedSeedCookie) {
@@ -134,26 +135,34 @@ public class BaseWebViewPresenter implements IPresenter {
             }
 
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (PayIntercepter.interceptPayIntent(view.getContext(), url)) {
+            public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+                if (PayIntercepter.interceptPayIntent(webView.getContext(), url)) {
                     return true;
                 }
-                String prevUrl = view.getUrl();
+                String prevUrl = webView.getUrl();
                 boolean isAutoRedirect = !isPageFinished(prevUrl);
                 if (isAutoRedirect) {// 如果是自动重定向，则交给webview处理。
                     if (LogMgr.DEBUG) {
                         LogMgr.d("core-web", "BaseWebViewPresenter shouldOverrideUrlLoading # auto redirect " + url);
                     }
-                    return super.shouldOverrideUrlLoading(view, url);
+                    return super.shouldOverrideUrlLoading(webView, url);
                 }
-                return mBaseView.onOverrideUrl(url);
+                return mBaseView.onOverrideUrl(webView, url);
+            }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView webView, String url) {
+                if (LogMgr.DEBUG) {
+                    LogMgr.d("core-web", "BaseWebViewPresenter shouldInterceptRequest # url " + url);
+                }
+                return mBaseView.onInterceptRequest(webView, url);
             }
         });
         mWebView.setWebChromeClient(new WebChromeClient() {
 
             @Override
             public void onShowCustomView(View view, CustomViewCallback callback) {
-                mBaseView.onShowCustomView(view);
+                mBaseView.onShowCustomView(view, callback);
             }
 
             @Override
@@ -162,19 +171,19 @@ public class BaseWebViewPresenter implements IPresenter {
             }
 
             @Override
-            public void onReceivedTitle(WebView view, String title) {
+            public void onReceivedTitle(WebView webView, String title) {
                 if (isHostFinishing()) {
                     return;
                 }
                 if (!mIsError && !mNeedSeedCookie) {
-                    mBaseView.onReceivedTitle(title);
+                    mBaseView.onReceivedTitle(webView, title);
                 }
             }
 
             @Override
-            public void onProgressChanged(WebView view, int newProgress) {
+            public void onProgressChanged(WebView webView, int newProgress) {
                 if (!mNeedSeedCookie) {
-                    mBaseView.onProgress(newProgress);
+                    mBaseView.onProgress(webView, newProgress);
                 }
             }
 
@@ -193,8 +202,8 @@ public class BaseWebViewPresenter implements IPresenter {
             // for >= Lollipop, all in one
             @Override
             @TargetApi(LOLLIPOP)
-            public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
-                return mBaseView.onShowFileChooser(filePathCallback);
+            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+                return mBaseView.onShowFileChooser(webView, filePathCallback);
             }
         });
         mWebView.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength)

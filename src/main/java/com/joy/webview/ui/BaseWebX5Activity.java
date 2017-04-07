@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
-import android.webkit.ValueCallback;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -22,9 +21,13 @@ import com.joy.webview.component.BaseWebX5Component;
 import com.joy.webview.component.DaggerBaseWebX5Component;
 import com.joy.webview.module.BaseWebX5Module;
 import com.joy.webview.presenter.IPresenter;
-import com.joy.webview.ui.interfaces.BaseViewWeb;
+import com.joy.webview.ui.interfaces.BaseViewWebX5;
 import com.joy.webview.ui.interfaces.KConstant;
 import com.joy.webview.view.NavigationBar;
+import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
+import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
+import com.tencent.smtt.sdk.ValueCallback;
+import com.tencent.smtt.sdk.WebView;
 
 import java.util.List;
 
@@ -37,13 +40,13 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
  * Created by Daisw on 16/9/7.
  */
 
-public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb, KConstant {
+public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWebX5, KConstant {
 
     @Inject
     IPresenter mPresenter;
 
     @Inject
-    UIDelegate mDelegate;
+    UIDelegateX5 mUIDelegate;
 
     private BaseWebX5Component component() {
         return DaggerBaseWebX5Component.builder()
@@ -58,8 +61,8 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     }
 
     @Override
-    public final UIDelegate getUIDelegate() {
-        return mDelegate;
+    public final UIDelegateX5 getUIDelegate() {
+        return mUIDelegate;
     }
 
     @Override
@@ -229,7 +232,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     }
 
     @Override
-    public void onPageStarted(String url, Bitmap favicon) {
+    public void onPageStarted(WebView webView, String url, Bitmap favicon) {
         getUIDelegate().onPageStarted(url, favicon);
     }
 
@@ -244,45 +247,46 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     }
 
     @Override
-    public void onReceivedTitle(String title) {
+    public void onReceivedTitle(WebView webView, String title) {
         getUIDelegate().onReceivedTitle(title);
     }
 
     @Override
-    public void onProgress(int progress) {
+    public void onProgress(WebView webView, int progress) {
         getUIDelegate().onProgress(progress);
     }
 
     @Override
-    public boolean onOverrideUrl(String url) {
-        return getUIDelegate().onOverrideUrl(url);
+    public boolean onOverrideUrl(WebView webView, String url) {
+        return false;
     }
 
     @Override
-    public void onShowCustomView(View view) {
-        getUIDelegate().onShowCustomView(view);
+    public WebResourceResponse onInterceptRequest(WebView webView, String url) {
+        return null;
+    }
+
+    @Override
+    public void onShowCustomView(View view, IX5WebChromeClient.CustomViewCallback callback) {
     }
 
     @Override
     public void onHideCustomView() {
-        getUIDelegate().onHideCustomView();
     }
 
     @Override
     public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-        getUIDelegate().onDownloadStart(url, userAgent, contentDisposition, mimetype, contentLength);
     }
 
     @Override
     @TargetApi(HONEYCOMB)
     public void onShowFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
-        getUIDelegate().onShowFileChooser(filePathCallback, acceptType);
     }
 
     @Override
     @TargetApi(LOLLIPOP)
-    public boolean onShowFileChooser(ValueCallback<Uri[]> filePathCallback) {
-        return getUIDelegate().onShowFileChooser(filePathCallback);
+    public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback) {
+        return false;
     }
 
     @Override

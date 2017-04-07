@@ -13,7 +13,7 @@ import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
 import com.joy.webview.R;
-import com.joy.webview.ui.interfaces.BaseViewWeb;
+import com.joy.webview.ui.interfaces.BaseViewWebX5;
 import com.joy.webview.utils.DocumentParser;
 import com.joy.webview.utils.PayIntercepter;
 import com.joy.webview.utils.TimeoutHandler;
@@ -21,6 +21,7 @@ import com.joy.webview.utils.UriUtils;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient.CustomViewCallback;
 import com.tencent.smtt.export.external.interfaces.WebResourceError;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
+import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebBackForwardList;
 import com.tencent.smtt.sdk.WebChromeClient;
@@ -55,7 +56,7 @@ public class BaseWebX5Presenter implements IPresenter {
     WebView mWebView;
 
     @Inject
-    BaseViewWeb mBaseView;
+    BaseViewWebX5 mBaseViewX5;
 
     private String mTempUrl;
     private Document mDocument;
@@ -75,9 +76,9 @@ public class BaseWebX5Presenter implements IPresenter {
         mWebView.setWebViewClient(new WebViewClient() {
 
             @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            public void onPageStarted(WebView webView, String url, Bitmap favicon) {
                 addTimeoutMessage();
-                String prevUrl = view.getUrl();
+                String prevUrl = webView.getUrl();
                 boolean isRedirected = !isPageFinished(prevUrl);
                 // 如果initialUrl被重定向了，则跳出方法体。
                 if (isRedirected) {// TODO: 2016/11/11 经测试只能捕捉首次打开的URL，页面内跳转时的重定向捕捉不到。
@@ -85,18 +86,18 @@ public class BaseWebX5Presenter implements IPresenter {
                 }
                 mPageFinished.put(url, false);
                 mIsError = false;
-                mBaseView.hideTipView();
-                if (!mBaseView.isProgressEnabled()) {
-                    mBaseView.hideContent();
-                    mBaseView.showLoading();
+                mBaseViewX5.hideTipView();
+                if (!mBaseViewX5.isProgressEnabled()) {
+                    mBaseViewX5.hideContent();
+                    mBaseViewX5.showLoading();
                 }
                 if (!mNeedSeedCookie) {
-                    mBaseView.onPageStarted(url, favicon);
+                    mBaseViewX5.onPageStarted(webView, url, favicon);
                 }
             }
 
             @Override
-            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+            public void onReceivedError(WebView webView, int errorCode, String description, String failingUrl) {
                 if (isHostFinishing()) {
                     return;
                 }
@@ -110,22 +111,22 @@ public class BaseWebX5Presenter implements IPresenter {
             }
 
             @Override
-            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+            public void onReceivedError(WebView webView, WebResourceRequest request, WebResourceError error) {
                 if (request.isForMainFrame()) {
-                    onReceivedError(view,
+                    onReceivedError(webView,
                             error.getErrorCode(), error.getDescription().toString(),
                             request.getUrl().toString());
                 }
             }
 
             @Override
-            public void onPageFinished(WebView view, String url) {
+            public void onPageFinished(WebView webView, String url) {
                 if (isHostFinishing()) {
                     return;
                 }
                 removeTimeoutMessage();
                 mPageFinished.put(url, true);
-                if (!url.equals(view.getUrl())) {// 如果当前URL和webview所持有的URL不一致时，抛掉当前URL的回调，跳出方法体。
+                if (!url.equals(webView.getUrl())) {// 如果当前URL和webview所持有的URL不一致时，抛掉当前URL的回调，跳出方法体。
                     return;
                 }
                 if (mNeedSeedCookie) {
@@ -136,82 +137,90 @@ public class BaseWebX5Presenter implements IPresenter {
                     if (mWebView.copyBackForwardList().getCurrentIndex() == -1) {
                         return;
                     }
-                    if (!mBaseView.isProgressEnabled()) {
-                        mBaseView.hideLoading();
+                    if (!mBaseViewX5.isProgressEnabled()) {
+                        mBaseViewX5.hideLoading();
                     }
-                    mBaseView.hideTipView();
-                    mBaseView.showContent();
+                    mBaseViewX5.hideTipView();
+                    mBaseViewX5.showContent();
                     getHtmlByTagName("html", 0);
                 }
             }
 
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (PayIntercepter.interceptPayIntent(view.getContext(), url)) {
+            public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+                if (PayIntercepter.interceptPayIntent(webView.getContext(), url)) {
                     return true;
                 }
-                String prevUrl = view.getUrl();
+                String prevUrl = webView.getUrl();
                 boolean isAutoRedirect = !isPageFinished(prevUrl);
                 if (isAutoRedirect) {// 如果是自动重定向，则交给webview处理。
                     if (LogMgr.DEBUG) {
                         LogMgr.d("core-web", "BaseWebX5Presenter shouldOverrideUrlLoading # auto redirect " + url);
                     }
-                    return super.shouldOverrideUrlLoading(view, url);
+                    return super.shouldOverrideUrlLoading(webView, url);
                 }
-                return mBaseView.onOverrideUrl(url);
+                return mBaseViewX5.onOverrideUrl(webView, url);
+            }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView webView, String url) {
+                if (LogMgr.DEBUG) {
+                    LogMgr.d("core-web", "BaseWebX5Presenter shouldInterceptRequest # url " + url);
+                }
+                return mBaseViewX5.onInterceptRequest(webView, url);
             }
         });
         mWebView.setWebChromeClient(new WebChromeClient() {
 
             @Override
             public void onShowCustomView(View view, CustomViewCallback callback) {
-                mBaseView.onShowCustomView(view);
+                mBaseViewX5.onShowCustomView(view, callback);
             }
 
             @Override
             public void onHideCustomView() {
-                mBaseView.onHideCustomView();
+                mBaseViewX5.onHideCustomView();
             }
 
             @Override
-            public void onReceivedTitle(WebView view, String title) {
+            public void onReceivedTitle(WebView webView, String title) {
                 if (isHostFinishing()) {
                     return;
                 }
                 if (!mIsError && !mNeedSeedCookie) {
-                    mBaseView.onReceivedTitle(title);
+                    mBaseViewX5.onReceivedTitle(webView, title);
                 }
             }
 
             @Override
-            public void onProgressChanged(WebView view, int newProgress) {
+            public void onProgressChanged(WebView webView, int newProgress) {
                 if (!mNeedSeedCookie) {
-                    mBaseView.onProgress(newProgress);
+                    mBaseViewX5.onProgress(webView, newProgress);
                 }
             }
 
             // file upload callback (Android 3.0 (API level 11) -- Android 4.0 (API level 15)) (hidden method)
             @TargetApi(HONEYCOMB)
             public void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
-                mBaseView.onShowFileChooser(filePathCallback, acceptType);
+                mBaseViewX5.onShowFileChooser(filePathCallback, acceptType);
             }
 
             // file upload callback (Android 4.1 (API level 16) -- Android 4.3 (API level 18)) (hidden method)
             @Override
             @TargetApi(JELLY_BEAN)
             public void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, String capture) {
-                mBaseView.onShowFileChooser(filePathCallback, acceptType);
+                mBaseViewX5.onShowFileChooser(filePathCallback, acceptType);
             }
 
             // for >= Lollipop, all in one
             @Override
             @TargetApi(LOLLIPOP)
-            public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
-                return mBaseView.onShowFileChooser(filePathCallback);
+            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+                return mBaseViewX5.onShowFileChooser(webView, filePathCallback);
             }
         });
         mWebView.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength)
-                -> mBaseView.onDownloadStart(url, userAgent, contentDisposition, mimetype, contentLength));
+                -> mBaseViewX5.onDownloadStart(url, userAgent, contentDisposition, mimetype, contentLength));
         mWebView.addJavascriptInterface(new JSHtmlSource() {
             @JavascriptInterface
             @WorkerThread
@@ -230,7 +239,7 @@ public class BaseWebX5Presenter implements IPresenter {
 
     @Inject
     void associatedHostLifecycle() {
-        mBaseView.lifecycle()
+        mBaseViewX5.lifecycle()
                 .subscribe(event -> {
                     switch (event) {
                         case PAUSE:
@@ -268,7 +277,7 @@ public class BaseWebX5Presenter implements IPresenter {
 
     private void onReceivedHtml(String html) {
         mDocument = Jsoup.parse(html);
-        mBaseView.onPageFinished(getUrl());
+        mBaseViewX5.onPageFinished(getUrl());
     }
 
     @SuppressLint("DefaultLocale")
@@ -320,12 +329,12 @@ public class BaseWebX5Presenter implements IPresenter {
 
     @Override
     public boolean isHostFinishing() {
-        return mBaseView.isFinishing();
+        return mBaseViewX5.isFinishing();
     }
 
     @Override
     public boolean isProgressEnabled() {
-        return mBaseView.isProgressEnabled();
+        return mBaseViewX5.isProgressEnabled();
     }
 
     @Override
@@ -371,12 +380,12 @@ public class BaseWebX5Presenter implements IPresenter {
     @Override
     public void switchErrorView(int errorCode, String description, String failingUrl) {
         mIsError = true;
-        if (!mBaseView.isProgressEnabled()) {
-            mBaseView.hideLoading();
+        if (!mBaseViewX5.isProgressEnabled()) {
+            mBaseViewX5.hideLoading();
         }
-        mBaseView.hideContent();
-        mBaseView.showErrorTip();
-        mBaseView.onReceivedError(errorCode, description, failingUrl);
+        mBaseViewX5.hideContent();
+        mBaseViewX5.showErrorTip();
+        mBaseViewX5.onReceivedError(errorCode, description, failingUrl);
     }
 
     @Override
@@ -427,13 +436,13 @@ public class BaseWebX5Presenter implements IPresenter {
                             steps--;
                             goBackOrForward(steps);
                         } else {
-                            mBaseView.finish();
+                            mBaseViewX5.finish();
                         }
                         return;
                     }
                     goBackOrForward(steps);
                 } else {
-                    mBaseView.finish();
+                    mBaseViewX5.finish();
                 }
                 return;
             }
@@ -441,7 +450,7 @@ public class BaseWebX5Presenter implements IPresenter {
                 return;
             }
         }
-        mBaseView.finish();
+        mBaseViewX5.finish();
     }
 
     @Override
@@ -463,7 +472,7 @@ public class BaseWebX5Presenter implements IPresenter {
                             steps++;
                             goBackOrForward(steps);
                         } else {
-                            mBaseView.showToast(R.string.toast_no_next_page);
+                            mBaseViewX5.showToast(R.string.toast_no_next_page);
                         }
                         return;
                     }
@@ -476,7 +485,7 @@ public class BaseWebX5Presenter implements IPresenter {
                 return;
             }
         }
-        mBaseView.showToast(R.string.toast_no_next_page);
+        mBaseViewX5.showToast(R.string.toast_no_next_page);
     }
 
     @Override

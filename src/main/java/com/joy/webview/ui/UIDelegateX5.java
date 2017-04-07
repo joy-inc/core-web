@@ -26,7 +26,7 @@ import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
 import com.joy.utils.ViewUtil;
 import com.joy.webview.R;
-import com.joy.webview.ui.interfaces.BaseViewWeb;
+import com.joy.webview.ui.interfaces.BaseViewWebX5;
 import com.joy.webview.utils.AnimatorUtils;
 import com.joy.webview.view.NavigationBar;
 
@@ -48,10 +48,10 @@ import static com.joy.webview.ui.interfaces.KConstant.KEY_URL;
  * Created by Daisw on 2016/11/4.
  */
 
-public class UIDelegate {
+public class UIDelegateX5 {
 
     @Inject
-    BaseViewWeb mBaseView;
+    BaseViewWebX5 mBaseViewX5;
 
     @Inject
     BaseUiActivity mActivity;
@@ -79,12 +79,12 @@ public class UIDelegate {
     boolean mLongClickable = true;
 
     @Inject
-    UIDelegate() {
+    UIDelegateX5() {
     }
 
     void onCreate() {
-        mActivity.setContentView(mBaseView.getPresenter().getWebView());
-        mBaseView.getPresenter().load(mUrl);
+        mActivity.setContentView(mBaseViewX5.getPresenter().getWebView());
+        mBaseViewX5.getPresenter().load(mUrl);
     }
 
     void resolveThemeAttribute() {
@@ -111,8 +111,8 @@ public class UIDelegate {
         mTitle = mActivity.getIntent().getCharSequenceExtra(KEY_TITLE);
 
         mJoyShare = new JoyShare(mActivity);
-        mJoyShare.setData(mBaseView.getShareItems());
-        mJoyShare.setOnItemClickListener((position, v, item) -> mBaseView.onShareItemClick(position, v, item));
+        mJoyShare.setData(mBaseViewX5.getShareItems());
+        mJoyShare.setOnItemClickListener((position, v, item) -> mBaseViewX5.onShareItemClick(position, v, item));
     }
 
     void initTitleView() {
@@ -150,7 +150,7 @@ public class UIDelegate {
     }
 
     void initContentView() {
-        mBaseView.getPresenter().getWebView().setOnLongClickListener((v) -> !mLongClickable);
+        mBaseViewX5.getPresenter().getWebView().setOnLongClickListener((v) -> !mLongClickable);
         addProgressBarIfNecessary();
         addNavBarIfNecessary();
     }
@@ -167,8 +167,8 @@ public class UIDelegate {
         dismissShare();
         ShareItem.DEFAULT def = item.mDefault;
         if (def != null) {
-            String curUrl = mBaseView.getPresenter().getUrl();
-            String curTitle = mBaseView.getPresenter().getTitle();
+            String curUrl = mBaseViewX5.getPresenter().getUrl();
+            String curTitle = mBaseViewX5.getPresenter().getTitle();
             switch (def) {
                 case COPY_LINK:
                     ShareUtil.copyUrl(mActivity, curUrl);
@@ -195,7 +195,7 @@ public class UIDelegate {
     }
 
 //    private View.OnClickListener getTitleBackClickListener() {
-//        return (v) -> mBaseView.onTitleBackClick();
+//        return (v) -> mBaseViewX5.onTitleBackClick();
 //    }
 
 //    public void setTitleMoreEnable(boolean enable) {
@@ -205,7 +205,7 @@ public class UIDelegate {
 //    private View.OnClickListener getTitleMoreClickListener() {
 //        return (v) -> {
 //            if (v.getAlpha() == 1.f)
-//                mBaseView.onTitleMoreClick();
+//                mBaseViewX5.onTitleMoreClick();
 //        };
 //    }
 
@@ -216,7 +216,7 @@ public class UIDelegate {
     private View.OnClickListener getTitleCloseClickListener() {
         return (v) -> {
             if (v.getAlpha() == 1.f)
-                mBaseView.onTitleCloseClick();
+                mBaseViewX5.onTitleCloseClick();
         };
     }
 
@@ -264,7 +264,7 @@ public class UIDelegate {
     @SuppressWarnings("ResourceType")
     private void addProgressBarIfNecessary() {
         if (mProgressEnable) {
-            mProgressBar = mBaseView.initProgressBar();
+            mProgressBar = mBaseViewX5.initProgressBar();
             mProgressBar.setAlpha(0.f);
             LayoutParams progressLp = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
             if (!mActivity.isNoTitle() && !mActivity.isOverlay()) {
@@ -281,7 +281,7 @@ public class UIDelegate {
 
     private void addNavBarIfNecessary() {
         if (mNavDisplay) {
-            mNavBar = mBaseView.initNavigationBar();
+            mNavBar = mBaseViewX5.initNavigationBar();
             if (mNavBar != null) {
                 addNavigationBar(mNavBar, generateNavBarLp(), mNavAnimate, false);
             }
@@ -343,10 +343,10 @@ public class UIDelegate {
     @Nullable
     NavigationBar initNavigationBar() {
         NavigationBar navBar = LayoutInflater.inflate(mActivity, R.layout.lib_view_web_navigation_bar);
-        navBar.getIvNav(0).setOnClickListener((v1) -> mBaseView.getPresenter().goBack());
+        navBar.getIvNav(0).setOnClickListener((v1) -> mBaseViewX5.getPresenter().goBack());
         navBar.getIvNav(1).setOnClickListener((v1) -> mActivity.finish());
-        navBar.getIvNav(2).setOnClickListener((v1) -> mBaseView.getPresenter().goForward());
-        navBar.getIvNav(3).setOnClickListener((v1) -> mBaseView.onNavCustomItemClick((ImageView) v1));
+        navBar.getIvNav(2).setOnClickListener((v1) -> mBaseViewX5.getPresenter().goForward());
+        navBar.getIvNav(3).setOnClickListener((v1) -> mBaseViewX5.onNavCustomItemClick((ImageView) v1));
         navBar.getIvNav(4).setOnClickListener((v1) -> mJoyShare.show());
         return navBar;
     }

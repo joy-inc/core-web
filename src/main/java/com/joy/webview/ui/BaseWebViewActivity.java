@@ -10,6 +10,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceResponse;
+import android.webkit.WebView;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -43,7 +46,7 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     IPresenter mPresenter;
 
     @Inject
-    UIDelegate mDelegate;
+    UIDelegate mUIDelegate;
 
     private BaseWebViewComponent component() {
         return DaggerBaseWebViewComponent.builder()
@@ -59,7 +62,7 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
 
     @Override
     public final UIDelegate getUIDelegate() {
-        return mDelegate;
+        return mUIDelegate;
     }
 
     @Override
@@ -229,7 +232,7 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     }
 
     @Override
-    public void onPageStarted(String url, Bitmap favicon) {
+    public void onPageStarted(WebView webView, String url, Bitmap favicon) {
         getUIDelegate().onPageStarted(url, favicon);
     }
 
@@ -244,45 +247,46 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     }
 
     @Override
-    public void onReceivedTitle(String title) {
+    public void onReceivedTitle(WebView webView, String title) {
         getUIDelegate().onReceivedTitle(title);
     }
 
     @Override
-    public void onProgress(int progress) {
+    public void onProgress(WebView webView, int progress) {
         getUIDelegate().onProgress(progress);
     }
 
     @Override
-    public boolean onOverrideUrl(String url) {
-        return getUIDelegate().onOverrideUrl(url);
+    public boolean onOverrideUrl(WebView webView, String url) {
+        return false;
     }
 
     @Override
-    public void onShowCustomView(View view) {
-        getUIDelegate().onShowCustomView(view);
+    public WebResourceResponse onInterceptRequest(WebView webView, String url) {
+        return null;
+    }
+
+    @Override
+    public void onShowCustomView(View view, WebChromeClient.CustomViewCallback callback) {
     }
 
     @Override
     public void onHideCustomView() {
-        getUIDelegate().onHideCustomView();
     }
 
     @Override
     public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-        getUIDelegate().onDownloadStart(url, userAgent, contentDisposition, mimetype, contentLength);
     }
 
     @Override
     @TargetApi(HONEYCOMB)
     public void onShowFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
-        getUIDelegate().onShowFileChooser(filePathCallback, acceptType);
     }
 
     @Override
     @TargetApi(LOLLIPOP)
-    public boolean onShowFileChooser(ValueCallback<Uri[]> filePathCallback) {
-        return getUIDelegate().onShowFileChooser(filePathCallback);
+    public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback) {
+        return false;
     }
 
     @Override

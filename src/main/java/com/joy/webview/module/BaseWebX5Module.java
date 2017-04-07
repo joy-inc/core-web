@@ -12,7 +12,7 @@ import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
 import com.joy.webview.presenter.BaseWebX5Presenter;
 import com.joy.webview.presenter.IPresenter;
-import com.joy.webview.ui.interfaces.BaseViewWeb;
+import com.joy.webview.ui.interfaces.BaseViewWebX5;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
 
@@ -26,18 +26,18 @@ import dagger.Provides;
 @Module(includes = ActivityModule.class)
 public class BaseWebX5Module {
 
-    private final BaseViewWeb mBaseViewWeb;
+    private final BaseViewWebX5 mBaseViewWebX5;
     private final boolean mCacheEnable;
 
-    public BaseWebX5Module(BaseViewWeb baseViewWeb, boolean cacheEnable) {
-        mBaseViewWeb = baseViewWeb;
+    public BaseWebX5Module(BaseViewWebX5 baseViewWebX5, boolean cacheEnable) {
+        mBaseViewWebX5 = baseViewWebX5;
         mCacheEnable = cacheEnable;
     }
 
     @Provides
     @ActivityScope
-    BaseViewWeb provideBaseViewWeb() {
-        return mBaseViewWeb;
+    BaseViewWebX5 provideBaseViewWebX5() {
+        return mBaseViewWebX5;
     }
 
     @Provides
@@ -62,7 +62,7 @@ public class BaseWebX5Module {
             @Override
             protected void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
                 if (isTouchTriggered) {
-                    mBaseViewWeb.onScrollChanged(scrollX, scrollY, oldScrollX, oldScrollY);
+                    mBaseViewWebX5.onScrollChanged(scrollX, scrollY, oldScrollX, oldScrollY);
                 }
             }
 
