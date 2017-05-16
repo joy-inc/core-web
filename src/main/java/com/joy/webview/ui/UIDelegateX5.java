@@ -1,16 +1,13 @@
 package com.joy.webview.ui;
 
-import android.annotation.TargetApi;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
-import android.webkit.ValueCallback;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -34,8 +31,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import static android.os.Build.VERSION_CODES.HONEYCOMB;
-import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.joy.ui.utils.DimenCons.HORIZONTAL_MARGINS;
@@ -116,7 +111,7 @@ public class UIDelegateX5 {
     }
 
     void initTitleView() {
-        if (!mActivity.isNoTitle()) {
+        if (mActivity.hasTitle()) {
 //            if (mTitleBackIcon != null) {
 //                mIbTitleBack = mActivity.addTitleLeftView(mTitleBackIcon, getTitleBackClickListener());
 //            }
@@ -126,11 +121,11 @@ public class UIDelegateX5 {
                 mIbTitleMore = mActivity.getTitleMoreView();
                 mIbTitleMore.setAlpha(0.f);
             }
-            if (mTitleCloseEnable) {
+            if (hasTitleClose()) {
                 mIbTitleClose = mActivity.addTitleRightView(mTitleCloseIcon, getTitleCloseClickListener());
                 mIbTitleClose.setAlpha(0.f);
             }
-            if (mActivity.hasTitleMore() && mTitleCloseEnable) {
+            if (mActivity.hasTitleMore() && hasTitleClose()) {
                 mIbTitleMore.setMinimumWidth(DP_40);
                 mIbTitleClose.setMinimumWidth(DP_40);
             }
@@ -213,6 +208,10 @@ public class UIDelegateX5 {
         mTitleCloseEnable = enable;
     }
 
+    public boolean hasTitleClose() {
+        return mTitleCloseEnable;
+    }
+
     private View.OnClickListener getTitleCloseClickListener() {
         return (v) -> {
             if (v.getAlpha() == 1.f)
@@ -229,14 +228,14 @@ public class UIDelegateX5 {
     }
 
     public void fadeInTitleAll() {
-        if (mTitleCloseEnable) {
-            fadeInTitleClose(200);
+        if (hasTitleClose()) {
+            fadeInTitleClose(0);
             if (mActivity.hasTitleMore()) {
-                fadeInTitleMore(400);
+                fadeInTitleMore(200);
             }
         } else {
             if (mActivity.hasTitleMore()) {
-                fadeInTitleMore(200);
+                fadeInTitleMore(0);
             }
         }
     }
@@ -267,7 +266,7 @@ public class UIDelegateX5 {
             mProgressBar = mBaseViewX5.initProgressBar();
             mProgressBar.setAlpha(0.f);
             LayoutParams progressLp = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
-            if (!mActivity.isNoTitle() && !mActivity.isOverlay()) {
+            if (mActivity.hasTitle() && !mActivity.isTitleOverlay()) {
                 int height = mActivity.getToolbarHeight();
                 progressLp.topMargin = mActivity.isSystemBarTrans() ? STATUS_BAR_HEIGHT + height : height;
             }
@@ -362,6 +361,7 @@ public class UIDelegateX5 {
         if (LogMgr.DEBUG) {
             LogMgr.d("core-web", mActivity.getClass().getSimpleName() + " onPageFinished # url: " + url);
         }
+        fadeInTitleAll();
         if (mNavDisplay && mNavAnimate && mNavBar != null) {
             mNavBar.runEnterAnimator();
         }
@@ -374,11 +374,10 @@ public class UIDelegateX5 {
     }
 
     void onReceivedTitle(String title) {
-        if (!mActivity.isNoTitle()) {
+        if (mActivity.hasTitle()) {
             if (TextUtil.isEmpty(mTitle)) {
                 setTitle(title);
             }
-            fadeInTitleAll();
         }
     }
 
