@@ -56,12 +56,12 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     }
 
     @Override
-    public final IPresenter getPresenter() {
+    public IPresenter getPresenter() {
         return mPresenter;
     }
 
     @Override
-    public final UIDelegate getUIDelegate() {
+    public UIDelegate getUIDelegate() {
         return mUIDelegate;
     }
 
@@ -94,11 +94,11 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
         getUIDelegate().initContentView();
     }
 
-    public final String getInitialUrl() {
+    public String getInitialUrl() {
         return getUIDelegate().getInitialUrl();
     }
 
-    public final String getUrl() {
+    public String getUrl() {
         return getPresenter().getUrl();
     }
 
@@ -117,19 +117,10 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
         return getPresenter().getTitle();
     }
 
-//    @Override
-//    public void setTitleColor(@ColorInt int color) {
-//        getUIDelegate().setTitleColor(color);
-//    }
-
     @Override
     public void onTitleBackClick(View v) {
         getPresenter().goBack();
     }
-
-//    public void setTitleMoreEnable(boolean enable) {
-//        getUIDelegate().setTitleMoreEnable(enable);
-//    }
 
     @Override
     public void onTitleMoreClick(View v) {
@@ -163,27 +154,27 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
         return getUIDelegate().initNavigationBar();
     }
 
-    public final NavigationBar getNavigationBar() {
+    public NavigationBar getNavigationBar() {
         return getUIDelegate().getNavigationBar();
     }
 
-    public final void addNavigationBar(@NonNull NavigationBar navBar) {
+    public void addNavigationBar(@NonNull NavigationBar navBar) {
         getUIDelegate().addNavigationBar(navBar);
     }
 
-    public final void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp) {
+    public void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp) {
         getUIDelegate().addNavigationBar(navBar, lp);
     }
 
-    public final void addNavigationBar(@NonNull NavigationBar navBar, boolean animate) {
+    public void addNavigationBar(@NonNull NavigationBar navBar, boolean animate) {
         getUIDelegate().addNavigationBar(navBar, animate);
     }
 
-    public final void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp, boolean animate) {
+    public void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp, boolean animate) {
         getUIDelegate().addNavigationBar(navBar, lp, animate);
     }
 
-    public final void setNavigationBarVisible(boolean visible) {
+    public void setNavigationBarVisible(boolean visible) {
         getUIDelegate().setNavigationBarVisible(visible);
     }
 
@@ -192,7 +183,7 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     }
 
     @Override
-    public final ShareAdapter getShareAdapter() {
+    public ShareAdapter getShareAdapter() {
         return getUIDelegate().getJoyShare().getAdapter();
     }
 
@@ -202,22 +193,22 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     }
 
     @Override
-    public final void addShareItem(ShareItem item) {
+    public void addShareItem(ShareItem item) {
         getUIDelegate().getJoyShare().add(item);
     }
 
     @Override
-    public final void addShareItem(int position, ShareItem item) {
+    public void addShareItem(int position, ShareItem item) {
         getUIDelegate().getJoyShare().add(position, item);
     }
 
     @Override
-    public final void addShareItems(List<ShareItem> items) {
+    public void addShareItems(List<ShareItem> items) {
         getUIDelegate().getJoyShare().addAll(items);
     }
 
     @Override
-    public final void addShareItems(int position, List<ShareItem> items) {
+    public void addShareItems(int position, List<ShareItem> items) {
         getUIDelegate().getJoyShare().addAll(position, items);
     }
 

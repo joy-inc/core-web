@@ -11,5 +11,5 @@ public interface KConstant {
     String KEY_TITLE = "KEY_TITLE";
     String KEY_CACHE_ENABLE = "KEY_CACHE_ENABLE";
 
-    int DP_40 = DimenCons.DP_1_PX * 40;
+    int DP_40 = DimenCons.DP_1 * 40;
 }

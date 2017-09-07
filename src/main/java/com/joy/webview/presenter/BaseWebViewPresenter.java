@@ -130,7 +130,9 @@ public class BaseWebViewPresenter implements IPresenter {
                     }
                     mBaseView.hideTipView();
                     mBaseView.showContent();
+
                     getHtmlByTagName("html", 0);
+//                    mBaseView.onPageFinished(url);
                 }
             }
 
