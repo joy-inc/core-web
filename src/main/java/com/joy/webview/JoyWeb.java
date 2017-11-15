@@ -20,7 +20,7 @@ public class JoyWeb {
 
     private static String mUserAgent;
 
-    private static String mCookie;
+    private static String mCookieUrl;
     private static boolean mCookieSeeded;
 
     private static boolean mAppCacheEnabled;
@@ -56,20 +56,20 @@ public class JoyWeb {
         return mUserAgent;
     }
 
-    public static void setCookie(@Nullable String cookie) {
-        mCookie = cookie;
-        if (TextUtil.isEmpty(cookie)) {
+    public static void setCookieUrl(@Nullable String cookieUrl) {
+        mCookieUrl = cookieUrl;
+        if (TextUtil.isEmpty(cookieUrl)) {
             clearCookie();
         }
     }
 
     @Nullable
-    public static String getCookie() {
-        return mCookie;
+    public static String getCookieUrl() {
+        return mCookieUrl;
     }
 
     public static void clearCookie() {
-        mCookie = null;
+        mCookieUrl = null;
         mCookieSeeded = false;
         removeAllCookies();
     }

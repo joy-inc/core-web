@@ -27,8 +27,6 @@ import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.joy.webview.utils.AnimatorUtils;
 import com.joy.webview.view.NavigationBar;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
@@ -54,13 +52,9 @@ public class UIDelegate {
     String mUrl;
     CharSequence mTitle;
     TextView mTvTitle;
-    //    boolean mTitleMoreEnable;
     boolean mTitleCloseEnable;
-    //    Drawable mTitleBackIcon;
-    //    Drawable mTitleMoreIcon;
     Drawable mTitleCloseIcon;
     boolean mProgressEnable;
-    //    ImageButton mIbTitleBack;
     ImageButton mIbTitleMore;
     ImageButton mIbTitleClose;
     JoyShare mJoyShare;
@@ -86,10 +80,7 @@ public class UIDelegate {
         TypedArray themeTa = mActivity.obtainStyledAttributes(R.styleable.Theme);
         mLongClickable = themeTa.getBoolean(R.styleable.Theme_longClickable, true);
         mProgressEnable = themeTa.getBoolean(R.styleable.Theme_progressEnable, false);
-//        mTitleBackIcon = themeTa.getDrawable(R.styleable.Theme_titleBackIcon);
-//        mTitleMoreIcon = themeTa.getDrawable(R.styleable.Theme_titleMoreIcon);
         mTitleCloseIcon = themeTa.getDrawable(R.styleable.Theme_titleCloseIcon);
-//        mTitleMoreEnable = mTitleMoreIcon != null;
         mTitleCloseEnable = mTitleCloseIcon != null;
         themeTa.recycle();
 
@@ -106,18 +97,13 @@ public class UIDelegate {
         mTitle = mActivity.getIntent().getCharSequenceExtra(KEY_TITLE);
 
         mJoyShare = new JoyShare(mActivity);
-        mJoyShare.setData(mBaseView.getShareItems());
+        mJoyShare.setData(mJoyShare.getDefaultItems());
         mJoyShare.setOnItemClickListener((position, v, item) -> mBaseView.onShareItemClick(position, v, item));
     }
 
     void initTitleView() {
         if (mActivity.hasTitle()) {
-//            if (mTitleBackIcon != null) {
-//                mIbTitleBack = mActivity.addTitleLeftView(mTitleBackIcon, getTitleBackClickListener());
-//            }
-//            if (mTitleMoreEnable) {
             if (mActivity.hasTitleMore()) {
-//                mIbTitleMore = mActivity.addTitleRightView(mTitleMoreIcon, getTitleMoreClickListener());
                 mIbTitleMore = mActivity.getTitleMoreView();
                 mIbTitleMore.setAlpha(0.f);
             }
@@ -129,9 +115,7 @@ public class UIDelegate {
                 mIbTitleMore.setMinimumWidth(DP_40);
                 mIbTitleClose.setMinimumWidth(DP_40);
             }
-//            mTvTitle = mActivity.addTitleMiddleView(mTitle);
             mActivity.setTitle(mTitle);
-//            mTvTitle = mActivity.getTitleTextView();
             if (TextUtil.isEmpty(mTitle)) {
                 mTvTitle.setAlpha(0.f);
             }
@@ -154,12 +138,8 @@ public class UIDelegate {
         return mJoyShare;
     }
 
-    public List<ShareItem> getDefaultShareItems() {
-        return mJoyShare.getDefaultItems();
-    }
-
     boolean onShareItemClick(ShareItem item) {
-        dismissShare();
+        getJoyShare().dismiss();
         ShareItem.DEFAULT def = item.mDefault;
         if (def != null) {
             String curUrl = mBaseView.getPresenter().getUrl();
@@ -180,29 +160,6 @@ public class UIDelegate {
         }
         return false;
     }
-
-    public void showShare() {
-        mJoyShare.show();
-    }
-
-    public void dismissShare() {
-        mJoyShare.dismiss();
-    }
-
-//    private View.OnClickListener getTitleBackClickListener() {
-//        return (v) -> mBaseView.onTitleBackClick();
-//    }
-
-//    public void setTitleMoreEnable(boolean enable) {
-//        mTitleMoreEnable = enable;
-//    }
-
-//    private View.OnClickListener getTitleMoreClickListener() {
-//        return (v) -> {
-//            if (v.getAlpha() == 1.f)
-//                mBaseView.onTitleMoreClick();
-//        };
-//    }
 
     public void setTitleCloseEnable(boolean enable) {
         mTitleCloseEnable = enable;
@@ -251,10 +208,6 @@ public class UIDelegate {
         mTvTitle = mActivity.getTitleTextView();
         AnimatorUtils.fadeIn(mTvTitle, title);
     }
-
-//    public void setTitleColor(@ColorInt int color) {
-//        mTvTitle.setTextColor(color);
-//    }
 
     public boolean isProgressEnabled() {
         return mProgressEnable;

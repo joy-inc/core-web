@@ -29,6 +29,8 @@ import com.tencent.smtt.sdk.WebHistoryItem;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
+import com.trello.rxlifecycle.android.ActivityEvent;
+import com.trello.rxlifecycle.android.FragmentEvent;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -74,7 +76,6 @@ public class BaseWebX5Presenter implements IPresenter {
     @Inject
     void setWebViewClient() {
         mWebView.setWebViewClient(new WebViewClient() {
-
             @Override
             public void onPageStarted(WebView webView, String url, Bitmap favicon) {
                 addTimeoutMessage();
@@ -171,7 +172,6 @@ public class BaseWebX5Presenter implements IPresenter {
             }
         });
         mWebView.setWebChromeClient(new WebChromeClient() {
-
             @Override
             public void onShowCustomView(View view, CustomViewCallback callback) {
                 mBaseViewX5.onShowCustomView(view, callback);
@@ -241,24 +241,48 @@ public class BaseWebX5Presenter implements IPresenter {
     void associatedHostLifecycle() {
         mBaseViewX5.lifecycle()
                 .subscribe(event -> {
-                    switch (event) {
-                        case PAUSE:
-                            if (isHostFinishing()) {
-                                removeTimeoutMessage();
-                                stopLoading();
-                            }
-                            onPause();
-                            break;
-                        case RESUME:
-                            onResume();
-                            break;
-                        case DESTROY:
-                            onDestroy();
-                            break;
-                        default:
-                            break;
+                    if (event instanceof ActivityEvent) {
+                        onActivityEvent((ActivityEvent) event);
+                    } else if (event instanceof FragmentEvent) {
+                        onFragmentEvent((FragmentEvent) event);
                     }
                 });
+    }
+
+    private void onActivityEvent(ActivityEvent event) {
+        switch (event) {
+            case PAUSE:
+                if (isHostFinishing()) {
+                    removeTimeoutMessage();
+                    stopLoading();
+                }
+                onPause();
+                break;
+            case RESUME:
+                onResume();
+                break;
+            case DESTROY:
+                onDestroy();
+                break;
+        }
+    }
+
+    private void onFragmentEvent(FragmentEvent event) {
+        switch (event) {
+            case PAUSE:
+                if (isHostFinishing()) {
+                    removeTimeoutMessage();
+                    stopLoading();
+                }
+                onPause();
+                break;
+            case RESUME:
+                onResume();
+                break;
+            case DESTROY:
+                onDestroy();
+                break;
+        }
     }
 
     private boolean isPageFinished(String url) {
@@ -391,7 +415,7 @@ public class BaseWebX5Presenter implements IPresenter {
     @Override
     public void load(String url) {
         if (TextUtil.isNotEmpty(url)) {
-            String cookieUrl = JoyWeb.getCookie();
+            String cookieUrl = JoyWeb.getCookieUrl();
             mNeedSeedCookie = TextUtil.isNotEmpty(cookieUrl) && !JoyWeb.isCookieSeeded();
             if (mNeedSeedCookie) {
                 mTempUrl = url;
@@ -426,7 +450,7 @@ public class BaseWebX5Presenter implements IPresenter {
         int steps = 0;
         if (prevItem != null) {
             steps--;
-            if (prevItem.getUrl().equals(JoyWeb.getCookie())) {
+            if (prevItem.getUrl().equals(JoyWeb.getCookieUrl())) {
                 prevItem = list.getItemAtIndex(curIndex - 2);
                 if (prevItem != null) {
                     steps--;
@@ -462,7 +486,7 @@ public class BaseWebX5Presenter implements IPresenter {
         int steps = 0;
         if (nextItem != null) {
             steps++;
-            if (nextItem.getUrl().equals(JoyWeb.getCookie())) {
+            if (nextItem.getUrl().equals(JoyWeb.getCookieUrl())) {
                 nextItem = list.getItemAtIndex(curIndex + 2);
                 if (nextItem != null) {
                     steps++;

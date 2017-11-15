@@ -28,6 +28,7 @@ import com.joy.webview.presenter.IPresenter;
 import com.joy.webview.ui.interfaces.BaseViewWeb;
 import com.joy.webview.ui.interfaces.KConstant;
 import com.joy.webview.view.NavigationBar;
+import com.trello.rxlifecycle.android.ActivityEvent;
 
 import java.util.List;
 
@@ -40,20 +41,13 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
  * Created by Daisw on 16/9/7.
  */
 
-public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewWeb, KConstant {
+public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewWeb<ActivityEvent>, KConstant {
 
     @Inject
     IPresenter mPresenter;
 
     @Inject
     UIDelegate mUIDelegate;
-
-    private BaseWebViewComponent component() {
-        return DaggerBaseWebViewComponent.builder()
-                .activityModule(new ActivityModule(this))
-                .baseWebViewModule(new BaseWebViewModule(this, getIntent().getBooleanExtra(KEY_CACHE_ENABLE, false)))
-                .build();
-    }
 
     @Override
     public IPresenter getPresenter() {
@@ -63,6 +57,13 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     @Override
     public UIDelegate getUIDelegate() {
         return mUIDelegate;
+    }
+
+    private BaseWebViewComponent component() {
+        return DaggerBaseWebViewComponent.builder()
+                .activityModule(new ActivityModule(this))
+                .baseWebViewModule(new BaseWebViewModule(this, getIntent().getBooleanExtra(KEY_CACHE_ENABLE, false)))
+                .build();
     }
 
     @Override
@@ -125,7 +126,7 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     @Override
     public void onTitleMoreClick(View v) {
         if (v.getAlpha() == 1.f) {
-            getUIDelegate().showShare();
+            getUIDelegate().getJoyShare().show();
         }
     }
 
@@ -182,32 +183,26 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     public void onNavCustomItemClick(ImageView view) {
     }
 
-    @Override
     public ShareAdapter getShareAdapter() {
         return getUIDelegate().getJoyShare().getAdapter();
     }
 
-    @Override
-    public List<ShareItem> getShareItems() {
-        return getUIDelegate().getDefaultShareItems();
+    public List<ShareItem> getShareDefaultItems() {
+        return getUIDelegate().getJoyShare().getDefaultItems();
     }
 
-    @Override
     public void addShareItem(ShareItem item) {
         getUIDelegate().getJoyShare().add(item);
     }
 
-    @Override
     public void addShareItem(int position, ShareItem item) {
         getUIDelegate().getJoyShare().add(position, item);
     }
 
-    @Override
     public void addShareItems(List<ShareItem> items) {
         getUIDelegate().getJoyShare().addAll(items);
     }
 
-    @Override
     public void addShareItems(int position, List<ShareItem> items) {
         getUIDelegate().getJoyShare().addAll(position, items);
     }
@@ -228,6 +223,11 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     }
 
     @Override
+    public void onProgress(WebView webView, int progress) {
+        getUIDelegate().onProgress(progress);
+    }
+
+    @Override
     public void onPageFinished(String url) {
         getUIDelegate().onPageFinished(url);
     }
@@ -240,11 +240,6 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     @Override
     public void onReceivedTitle(WebView webView, String title) {
         getUIDelegate().onReceivedTitle(title);
-    }
-
-    @Override
-    public void onProgress(WebView webView, int progress) {
-        getUIDelegate().onProgress(progress);
     }
 
     @Override
@@ -266,10 +261,6 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     }
 
     @Override
-    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-    }
-
-    @Override
     @TargetApi(HONEYCOMB)
     public void onShowFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
     }
@@ -278,6 +269,10 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
     @TargetApi(LOLLIPOP)
     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback) {
         return false;
+    }
+
+    @Override
+    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
     }
 
     @Override

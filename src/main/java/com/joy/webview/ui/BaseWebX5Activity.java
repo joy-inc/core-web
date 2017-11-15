@@ -28,6 +28,7 @@ import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
 import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebView;
+import com.trello.rxlifecycle.android.ActivityEvent;
 
 import java.util.List;
 
@@ -40,7 +41,7 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
  * Created by Daisw on 16/9/7.
  */
 
-public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWebX5, KConstant {
+public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWebX5<ActivityEvent>, KConstant {
 
     @Inject
     IPresenter mPresenter;
@@ -48,21 +49,21 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     @Inject
     UIDelegateX5 mUIDelegate;
 
+    @Override
+    public IPresenter getPresenter() {
+        return mPresenter;
+    }
+
+    @Override
+    public UIDelegateX5 getUIDelegate() {
+        return mUIDelegate;
+    }
+
     private BaseWebX5Component component() {
         return DaggerBaseWebX5Component.builder()
                 .activityModule(new ActivityModule(this))
                 .baseWebX5Module(new BaseWebX5Module(this, getIntent().getBooleanExtra(KEY_CACHE_ENABLE, false)))
                 .build();
-    }
-
-    @Override
-    public final IPresenter getPresenter() {
-        return mPresenter;
-    }
-
-    @Override
-    public final UIDelegateX5 getUIDelegate() {
-        return mUIDelegate;
     }
 
     @Override
@@ -94,11 +95,11 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         getUIDelegate().initContentView();
     }
 
-    public final String getUrl() {
+    public String getUrl() {
         return getPresenter().getUrl();
     }
 
-    public final String getInitialUrl() {
+    public String getInitialUrl() {
         return getUIDelegate().getInitialUrl();
     }
 
@@ -117,24 +118,15 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         return getPresenter().getTitle();
     }
 
-//    @Override
-//    public void setTitleColor(@ColorInt int color) {
-//        getUIDelegate().setTitleColor(color);
-//    }
-
     @Override
     public void onTitleBackClick(View v) {
         getPresenter().goBack();
     }
 
-//    public void setTitleMoreEnable(boolean enable) {
-//        getUIDelegate().setTitleMoreEnable(enable);
-//    }
-
     @Override
     public void onTitleMoreClick(View v) {
         if (v.getAlpha() == 1.f) {
-            getUIDelegate().showShare();
+            getUIDelegate().getJoyShare().show();
         }
     }
 
@@ -163,27 +155,27 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         return getUIDelegate().initNavigationBar();
     }
 
-    public final NavigationBar getNavigationBar() {
+    public NavigationBar getNavigationBar() {
         return getUIDelegate().getNavigationBar();
     }
 
-    public final void addNavigationBar(@NonNull NavigationBar navBar) {
+    public void addNavigationBar(@NonNull NavigationBar navBar) {
         getUIDelegate().addNavigationBar(navBar);
     }
 
-    public final void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp) {
+    public void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp) {
         getUIDelegate().addNavigationBar(navBar, lp);
     }
 
-    public final void addNavigationBar(@NonNull NavigationBar navBar, boolean animate) {
+    public void addNavigationBar(@NonNull NavigationBar navBar, boolean animate) {
         getUIDelegate().addNavigationBar(navBar, animate);
     }
 
-    public final void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp, boolean animate) {
+    public void addNavigationBar(@NonNull NavigationBar navBar, @NonNull LayoutParams lp, boolean animate) {
         getUIDelegate().addNavigationBar(navBar, lp, animate);
     }
 
-    public final void setNavigationBarVisible(boolean visible) {
+    public void setNavigationBarVisible(boolean visible) {
         getUIDelegate().setNavigationBarVisible(visible);
     }
 
@@ -191,33 +183,27 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     public void onNavCustomItemClick(ImageView view) {
     }
 
-    @Override
-    public final ShareAdapter getShareAdapter() {
+    public ShareAdapter getShareAdapter() {
         return getUIDelegate().getJoyShare().getAdapter();
     }
 
-    @Override
-    public List<ShareItem> getShareItems() {
-        return getUIDelegate().getDefaultShareItems();
+    public List<ShareItem> getShareDefaultItems() {
+        return getUIDelegate().getJoyShare().getDefaultItems();
     }
 
-    @Override
-    public final void addShareItem(ShareItem item) {
+    public void addShareItem(ShareItem item) {
         getUIDelegate().getJoyShare().add(item);
     }
 
-    @Override
-    public final void addShareItem(int position, ShareItem item) {
+    public void addShareItem(int position, ShareItem item) {
         getUIDelegate().getJoyShare().add(position, item);
     }
 
-    @Override
-    public final void addShareItems(List<ShareItem> items) {
+    public void addShareItems(List<ShareItem> items) {
         getUIDelegate().getJoyShare().addAll(items);
     }
 
-    @Override
-    public final void addShareItems(int position, List<ShareItem> items) {
+    public void addShareItems(int position, List<ShareItem> items) {
         getUIDelegate().getJoyShare().addAll(position, items);
     }
 
@@ -237,6 +223,11 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     }
 
     @Override
+    public void onProgress(WebView webView, int progress) {
+        getUIDelegate().onProgress(progress);
+    }
+
+    @Override
     public void onPageFinished(String url) {
         getUIDelegate().onPageFinished(url);
     }
@@ -249,11 +240,6 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     @Override
     public void onReceivedTitle(WebView webView, String title) {
         getUIDelegate().onReceivedTitle(title);
-    }
-
-    @Override
-    public void onProgress(WebView webView, int progress) {
-        getUIDelegate().onProgress(progress);
     }
 
     @Override
@@ -275,10 +261,6 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     }
 
     @Override
-    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-    }
-
-    @Override
     @TargetApi(HONEYCOMB)
     public void onShowFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
     }
@@ -287,6 +269,10 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
     @TargetApi(LOLLIPOP)
     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback) {
         return false;
+    }
+
+    @Override
+    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
     }
 
     @Override
