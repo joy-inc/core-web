@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
@@ -17,6 +18,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.joy.inject.ActivityScope;
 import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
@@ -48,6 +50,7 @@ import static com.joy.webview.utils.TimeoutHandler.WHAT_TIMEOUT_ERROR;
  * Created by Daisw on 16/8/14.
  */
 
+@ActivityScope
 @SuppressLint("AddJavascriptInterface")
 public class BaseWebViewPresenter implements IPresenter {
 
@@ -224,19 +227,8 @@ public class BaseWebViewPresenter implements IPresenter {
         }, "htmlSource");
     }
 
-    @Inject
-    void associatedHostLifecycle() {
-        mBaseView.lifecycle()
-                .subscribe(event -> {
-                    if (event instanceof ActivityEvent) {
-                        onActivityEvent((ActivityEvent) event);
-                    } else if (event instanceof FragmentEvent) {
-                        onFragmentEvent((FragmentEvent) event);
-                    }
-                });
-    }
-
-    private void onActivityEvent(ActivityEvent event) {
+    @Override
+    public void onLifecycleEvent(ActivityEvent event) {
         switch (event) {
             case PAUSE:
                 if (isHostFinishing()) {
@@ -254,7 +246,8 @@ public class BaseWebViewPresenter implements IPresenter {
         }
     }
 
-    private void onFragmentEvent(FragmentEvent event) {
+    @Override
+    public void onLifecycleEvent(FragmentEvent event) {
         switch (event) {
             case PAUSE:
                 if (isHostFinishing()) {
@@ -266,7 +259,8 @@ public class BaseWebViewPresenter implements IPresenter {
             case RESUME:
                 onResume();
                 break;
-            case DESTROY:
+            case DESTROY_VIEW:
+                removeTimeoutMessage();
                 onDestroy();
                 break;
         }
@@ -368,19 +362,27 @@ public class BaseWebViewPresenter implements IPresenter {
         return mWebView.getContentHeight();
     }
 
-    @Override
     public void onPause() {
         mWebView.onPause();
     }
 
-    @Override
     public void onResume() {
         mWebView.onResume();
     }
 
-    @Override
     public void onDestroy() {
+        if (mWebView.getParent() != null) {
+            // Note: Make sure you remove the webview from its parent view before doing anything.
+            ((ViewGroup) mWebView.getParent()).removeView(mWebView);
+        }
+        mWebView.clearHistory();
+        mWebView.clearCache(false);// only the RAM cache is cleared.
+        mWebView.loadUrl("about:blank");// Loading a blank page is optional, but will ensure that the webview isn't doing anything when you destory it.
+        mWebView.onPause();
+        mWebView.removeAllViews();
+        mWebView.destroyDrawingCache();
         mWebView.destroy();
+        mWebView = null;
     }
 
     @Override
@@ -483,7 +485,7 @@ public class BaseWebViewPresenter implements IPresenter {
                             steps++;
                             goBackOrForward(steps);
                         } else {
-                            mBaseView.showToast(R.string.toast_no_next_page);
+                            mBaseView.showToast(R.string.toast_nothing);
                         }
                         return;
                     }
@@ -496,7 +498,7 @@ public class BaseWebViewPresenter implements IPresenter {
                 return;
             }
         }
-        mBaseView.showToast(R.string.toast_no_next_page);
+        mBaseView.showToast(R.string.toast_nothing);
     }
 
     @Override

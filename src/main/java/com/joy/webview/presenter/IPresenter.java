@@ -4,6 +4,9 @@ import android.support.annotation.WorkerThread;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 
+import com.trello.rxlifecycle.android.ActivityEvent;
+import com.trello.rxlifecycle.android.FragmentEvent;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -26,11 +29,9 @@ public interface IPresenter {
 
     int getContentHeight();
 
-    void onPause();
+    void onLifecycleEvent(ActivityEvent event);
 
-    void onResume();
-
-    void onDestroy();
+    void onLifecycleEvent(FragmentEvent event);
 
     void stopLoading();
 

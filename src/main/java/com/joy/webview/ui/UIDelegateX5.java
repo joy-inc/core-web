@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.joy.inject.ActivityScope;
 import com.joy.share.JoyShare;
 import com.joy.share.ShareItem;
 import com.joy.share.ShareUtil;
@@ -41,6 +42,7 @@ import static com.joy.webview.ui.interfaces.KConstant.KEY_URL;
  * Created by Daisw on 2016/11/4.
  */
 
+@ActivityScope
 public class UIDelegateX5 {
 
     @Inject
@@ -97,7 +99,7 @@ public class UIDelegateX5 {
         mTitle = mActivity.getIntent().getCharSequenceExtra(KEY_TITLE);
 
         mJoyShare = new JoyShare(mActivity);
-        mJoyShare.setData(mJoyShare.getDefaultItems());
+        mJoyShare.setData(mBaseViewX5.getShareItems());
         mJoyShare.setOnItemClickListener((position, v, item) -> mBaseViewX5.onShareItemClick(position, v, item));
     }
 

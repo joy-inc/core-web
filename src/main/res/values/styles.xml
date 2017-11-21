@@ -29,4 +29,13 @@
         <item name="shareViewSpacing">6dp</item>
     </style>
 
+    <style name="base_theme.web.page">
+        <item name="navDisplay">true</item>
+        <item name="navAnimate">false</item>
+        <item name="navIconFirst">@drawable/ic_format_list_bulleted_black_24dp</item>
+        <item name="navIconSecond">@drawable/ic_expand_less_black_24dp</item>
+        <item name="navIconThird">@drawable/ic_expand_more_black_24dp</item>
+        <item name="navIconFourth">@drawable/ic_more_horiz_black_24dp</item>
+        <item name="navIconFifth">@null</item>
+    </style>
 </resources>

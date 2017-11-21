@@ -17,6 +17,8 @@ import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebView;
 
+import java.util.List;
+
 import static android.os.Build.VERSION_CODES.HONEYCOMB;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
@@ -51,5 +53,6 @@ public interface BaseViewWebX5<E> extends BaseViewNet<E> {
     @TargetApi(LOLLIPOP) boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback);
     void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength);
 
+    List<ShareItem> getShareItems();
     boolean onShareItemClick(int position, View v, ShareItem item);
 }

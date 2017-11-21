@@ -2,7 +2,9 @@ package com.joy.webview.module;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.os.Build;
 import android.view.MotionEvent;
+import android.view.View;
 
 import com.joy.inject.ActivityScope;
 import com.joy.inject.module.ActivityModule;
@@ -13,6 +15,7 @@ import com.joy.webview.JoyWeb;
 import com.joy.webview.presenter.BaseWebX5Presenter;
 import com.joy.webview.presenter.IPresenter;
 import com.joy.webview.ui.interfaces.BaseViewWebX5;
+import com.joy.webview.view.WebX5;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
 
@@ -56,7 +59,7 @@ public class BaseWebX5Module {
     @ActivityScope
     @SuppressLint("SetJavaScriptEnabled")
     WebView provideWebView(Activity activity) {
-        WebView webView = new WebView(activity) {
+        WebX5 webView = new WebX5(activity) {
             boolean isTouchTriggered = false;
 
             @Override
@@ -99,6 +102,15 @@ public class BaseWebX5Module {
             settings.setCacheMode(networkEnable ? WebSettings.LOAD_NO_CACHE : WebSettings.LOAD_CACHE_ONLY);
         } else {
             settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        }
+
+        settings.setRenderPriority(WebSettings.RenderPriority.HIGH);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            // chromium, enable hardware acceleration
+            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        } else {
+            // older android version, disable hardware acceleration
+            webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         }
         return webView;
     }
