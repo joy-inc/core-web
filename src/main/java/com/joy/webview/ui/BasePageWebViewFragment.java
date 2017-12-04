@@ -14,6 +14,7 @@ import com.joy.utils.TextUtil;
 import com.joy.webview.R;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static com.joy.ui.utils.DimenCons.DP;
 
 /**
  * Created by Daisw on 2017/11/15.

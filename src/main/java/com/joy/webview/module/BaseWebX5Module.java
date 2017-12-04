@@ -22,6 +22,9 @@ import com.tencent.smtt.sdk.WebView;
 import dagger.Module;
 import dagger.Provides;
 
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.KITKAT;
+
 /**
  * Created by Daisw on 16/8/16.
  */
@@ -105,7 +108,7 @@ public class BaseWebX5Module {
         }
 
         settings.setRenderPriority(WebSettings.RenderPriority.HIGH);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if (SDK_INT >= KITKAT) {
             // chromium, enable hardware acceleration
             webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         } else {
