@@ -31,7 +31,11 @@ public class JoyWeb {
 
     static {
         mAppCacheEnabled = true;
-        mAppCachePath = BaseApplication.getContext().getExternalCacheDir().getPath();
+        try {
+            mAppCachePath = BaseApplication.getContext().getExternalCacheDir().getPath();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         mAppCacheMaxSize = 1024 * 1024 * 8;// 8M
         mTimeoutDuration = 15 * 1000;// 10s
     }
