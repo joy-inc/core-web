@@ -9,12 +9,12 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.joy.ui.utils.DimenCons;
 import com.joy.ui.view.JWebView;
 import com.joy.utils.TextUtil;
 import com.joy.webview.R;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static com.joy.ui.utils.DimenCons.DP;
 
 /**
  * Created by Daisw on 2017/11/15.
@@ -34,7 +34,7 @@ public class BasePageWebViewFragment extends BaseWebViewFragment {
         LinearLayout llRoot = new LinearLayout(getActivity());
         llRoot.setLayoutParams(new LayoutParams(MATCH_PARENT, MATCH_PARENT));
         llRoot.setOrientation(LinearLayout.VERTICAL);
-        llRoot.addView(inflateLayout(R.layout.lib_view_page_margin), new LayoutParams(MATCH_PARENT, DP(80)));
+        llRoot.addView(inflateLayout(R.layout.lib_view_page_margin), new LayoutParams(MATCH_PARENT, DimenCons.DP(80)));
         llRoot.addView(contentView, new LayoutParams(MATCH_PARENT, MATCH_PARENT));
         super.setContentView(llRoot);
     }
