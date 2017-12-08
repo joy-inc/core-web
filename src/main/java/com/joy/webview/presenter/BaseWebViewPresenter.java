@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
@@ -19,7 +20,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.joy.inject.ActivityScope;
-import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
 import com.joy.webview.R;
@@ -143,22 +143,22 @@ public class BaseWebViewPresenter implements IPresenter {
                 if (PayIntercepter.interceptPayIntent(webView.getContext(), url)) {
                     return true;
                 }
-                String prevUrl = webView.getUrl();
-                boolean isAutoRedirect = !isPageFinished(prevUrl);
-                if (isAutoRedirect) {// 如果是自动重定向，则交给webview处理。
-                    if (LogMgr.DEBUG) {
-                        LogMgr.d("core-web", "BaseWebViewPresenter shouldOverrideUrlLoading # auto redirect " + url);
-                    }
-                    return super.shouldOverrideUrlLoading(webView, url);
-                }
+//                String prevUrl = webView.getUrl();
+//                boolean isAutoRedirect = !isPageFinished(prevUrl);
+//                if (isAutoRedirect) {// 如果是自动重定向，则交给webview处理。
+//                    if (LogMgr.DEBUG) {
+//                        LogMgr.d("core-web", "BaseWebViewPresenter shouldOverrideUrlLoading # auto redirect " + url);
+//                    }
+//                    return super.shouldOverrideUrlLoading(webView, url);
+//                }
                 return mBaseView.onOverrideUrl(webView, url);
             }
 
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView webView, String url) {
-                if (LogMgr.DEBUG) {
-                    LogMgr.d("core-web", "BaseWebViewPresenter shouldInterceptRequest # url " + url);
-                }
+//                if (LogMgr.DEBUG) {
+//                    LogMgr.d("core-web", "BaseWebViewPresenter shouldInterceptRequest # url " + url);
+//                }
                 return mBaseView.onInterceptRequest(webView, url);
             }
         });
@@ -207,6 +207,11 @@ public class BaseWebViewPresenter implements IPresenter {
             @TargetApi(LOLLIPOP)
             public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
                 return mBaseView.onShowFileChooser(webView, filePathCallback);
+            }
+
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+                return mBaseView.onConsoleMessage(consoleMessage);
             }
         });
         mWebView.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength)

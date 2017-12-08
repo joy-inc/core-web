@@ -12,6 +12,7 @@ import com.joy.ui.interfaces.BaseViewNet;
 import com.joy.webview.presenter.IPresenter;
 import com.joy.webview.ui.UIDelegateX5;
 import com.joy.webview.view.NavigationBar;
+import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
 import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.ValueCallback;
@@ -52,6 +53,7 @@ public interface BaseViewWebX5<E> extends BaseViewNet<E> {
     @TargetApi(HONEYCOMB) void onShowFileChooser(ValueCallback<Uri> filePathCallback, String acceptType);
     @TargetApi(LOLLIPOP) boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback);
     void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength);
+    boolean onConsoleMessage(ConsoleMessage consoleMessage);
 
     List<ShareItem> getShareItems();
     boolean onShareItemClick(int position, View v, ShareItem item);

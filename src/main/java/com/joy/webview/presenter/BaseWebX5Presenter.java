@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 
 import com.joy.inject.ActivityScope;
-import com.joy.utils.LogMgr;
 import com.joy.utils.TextUtil;
 import com.joy.webview.JoyWeb;
 import com.joy.webview.R;
@@ -20,6 +19,7 @@ import com.joy.webview.utils.DocumentParser;
 import com.joy.webview.utils.PayIntercepter;
 import com.joy.webview.utils.TimeoutHandler;
 import com.joy.webview.utils.UriUtils;
+import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient.CustomViewCallback;
 import com.tencent.smtt.export.external.interfaces.WebResourceError;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
@@ -155,22 +155,22 @@ public class BaseWebX5Presenter implements IPresenter {
                 if (PayIntercepter.interceptPayIntent(webView.getContext(), url)) {
                     return true;
                 }
-                String prevUrl = webView.getUrl();
-                boolean isAutoRedirect = !isPageFinished(prevUrl);
-                if (isAutoRedirect) {// 如果是自动重定向，则交给webview处理。
-                    if (LogMgr.DEBUG) {
-                        LogMgr.d("core-web", "BaseWebX5Presenter shouldOverrideUrlLoading # auto redirect " + url);
-                    }
-                    return super.shouldOverrideUrlLoading(webView, url);
-                }
+//                String prevUrl = webView.getUrl();
+//                boolean isAutoRedirect = !isPageFinished(prevUrl);
+//                if (isAutoRedirect) {// 如果是自动重定向，则交给webview处理。
+//                    if (LogMgr.DEBUG) {
+//                        LogMgr.d("core-web", "BaseWebX5Presenter shouldOverrideUrlLoading # auto redirect " + url);
+//                    }
+//                    return super.shouldOverrideUrlLoading(webView, url);
+//                }
                 return mBaseViewX5.onOverrideUrl(webView, url);
             }
 
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView webView, String url) {
-                if (LogMgr.DEBUG) {
-                    LogMgr.d("core-web", "BaseWebX5Presenter shouldInterceptRequest # url " + url);
-                }
+//                if (LogMgr.DEBUG) {
+//                    LogMgr.d("core-web", "BaseWebX5Presenter shouldInterceptRequest # url " + url);
+//                }
                 return mBaseViewX5.onInterceptRequest(webView, url);
             }
         });
@@ -220,6 +220,11 @@ public class BaseWebX5Presenter implements IPresenter {
             @TargetApi(LOLLIPOP)
             public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
                 return mBaseViewX5.onShowFileChooser(webView, filePathCallback);
+            }
+
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+                return mBaseViewX5.onConsoleMessage(consoleMessage);
             }
         });
         mWebView.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength)

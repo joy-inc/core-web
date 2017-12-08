@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.webkit.ConsoleMessage;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceResponse;
@@ -155,7 +156,7 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
         return getUIDelegate().initNavigationBar();
     }
 
-    public NavigationBar getNavigationBar() {
+    public final NavigationBar getNavigationBar() {
         return getUIDelegate().getNavigationBar();
     }
 
@@ -278,6 +279,11 @@ public class BaseWebViewActivity extends BaseHttpUiActivity implements BaseViewW
 
     @Override
     public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+    }
+
+    @Override
+    public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+        return false;
     }
 
     @Override

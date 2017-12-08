@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.View;
+import android.webkit.ConsoleMessage;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceResponse;
@@ -52,6 +53,7 @@ public interface BaseViewWeb<E> extends BaseViewNet<E> {
     @TargetApi(HONEYCOMB) void onShowFileChooser(ValueCallback<Uri> filePathCallback, String acceptType);
     @TargetApi(LOLLIPOP) boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback);
     void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength);
+    boolean onConsoleMessage(ConsoleMessage consoleMessage);
 
     List<ShareItem> getShareItems();
     boolean onShareItemClick(int position, View v, ShareItem item);

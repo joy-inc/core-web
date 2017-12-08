@@ -24,6 +24,7 @@ import com.joy.webview.presenter.IPresenter;
 import com.joy.webview.ui.interfaces.BaseViewWebX5;
 import com.joy.webview.ui.interfaces.KConstant;
 import com.joy.webview.view.NavigationBar;
+import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
 import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.ValueCallback;
@@ -155,7 +156,7 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
         return getUIDelegate().initNavigationBar();
     }
 
-    public NavigationBar getNavigationBar() {
+    public final NavigationBar getNavigationBar() {
         return getUIDelegate().getNavigationBar();
     }
 
@@ -278,6 +279,11 @@ public class BaseWebX5Activity extends BaseHttpUiActivity implements BaseViewWeb
 
     @Override
     public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+    }
+
+    @Override
+    public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+        return false;
     }
 
     @Override
