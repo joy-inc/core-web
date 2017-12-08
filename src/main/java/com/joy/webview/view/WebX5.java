@@ -26,7 +26,9 @@ public class WebX5 extends WebView implements VerticalViewPager.Scrollable {
 
     @Override
     public boolean canScrollUp() {
-        return getWebScrollY() < getContentHeight() * getScale() - getMeasuredHeight();
+        final float scale = getScale();
+        final float approximately = Math.floor(scale) < scale ? scale : 0;
+        return getWebScrollY() < Math.floor(getContentHeight() * getScale() - getMeasuredHeight()) - approximately;
     }
 
     @Override
