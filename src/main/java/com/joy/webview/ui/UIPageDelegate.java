@@ -134,9 +134,9 @@ public class UIPageDelegate<F extends BaseUiFragment> {
                 }
                 if (position > 0) {
                     updateTitles(mFragments.get(position), position - 1);
-                    if (position + 1 < mFragments.size()) {
-                        updateTitles(mFragments.get(position + 1), position + 1);
-                    }
+                }
+                if (position + 1 < mFragments.size()) {
+                    updateTitles(mFragments.get(position + 1), position + 1);
                 }
             }
         });
@@ -146,11 +146,11 @@ public class UIPageDelegate<F extends BaseUiFragment> {
         if (f instanceof BasePageWebViewFragment) {
             ((BasePageWebViewFragment) f)
                     .setPageTitle(mPageEntities.get(position).getTitle())
-                    .setPageSubtitle(mActivity.getString(R.string.prev_page));
+                    .setPageSubtitle(mActivity.getString(position < mCurrentPosition ? R.string.prev_page : R.string.next_page));
         } else if (f instanceof BasePageWebX5Fragment) {
             ((BasePageWebX5Fragment) f)
                     .setPageTitle(mPageEntities.get(position).getTitle())
-                    .setPageSubtitle(mActivity.getString(R.string.prev_page));
+                    .setPageSubtitle(mActivity.getString(position < mCurrentPosition ? R.string.prev_page : R.string.next_page));
         }
     }
 
@@ -253,5 +253,13 @@ public class UIPageDelegate<F extends BaseUiFragment> {
                 mNavBar.runEnterAnimator();
             }
         }
+    }
+
+    public F getCurrentFragment() {
+        return mFragments.get(mCurrentPosition);
+    }
+
+    public int getCurrentPosition() {
+        return mCurrentPosition;
     }
 }
