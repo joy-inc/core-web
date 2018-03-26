@@ -367,7 +367,7 @@ public class BaseWebX5Presenter implements IPresenter {
 
     @Override
     public String getUrl() {
-        return mWebView.getUrl() == null ? "" : mWebView.getUrl();
+        return (mWebView == null || mWebView.getUrl() == null) ? "" : mWebView.getUrl();
     }
 
     @Override
